@@ -1,0 +1,30 @@
+<!doctype html> 
+<html> 
+	<head> 
+		<title>BitmapData.js Example</title> 
+		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+		<script type="text/javascript" src="BitmapData.js"></script>
+	</head> 
+	<body> 
+		<canvas id="canvas" width="100" height="100"></canvas>
+		<script> 
+			var canvas = document.getElementById("canvas");
+			var context = canvas.getContext("2d");
+		
+			var bmd = new BitmapData(100, 100, true, 0xff2200);
+
+			for(i=0; i<canvas.width; i++) {
+				bmd.setPixel(i, i, 0x00ff00);
+			}
+			
+			bmd.fillRect(new Rectangle(20, 20, 20, 20), 0x0000ff)
+			
+			context.putImageData(bmd.getPixels(), 0, 0);
+			
+			var bmd2 = bmd.clone();
+			
+			context.putImageData(bmd2.getPixels(), 40, 40);
+			
+		</script> 
+	</body> 
+</html>
