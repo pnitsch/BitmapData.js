@@ -36,16 +36,39 @@ function BitmapData (width, height, transparent, fillColor) {
 		return bmd;
 	}
 	
-	this.fillRect = function(rect, color) {
+	this.setPixel = function(x, y, color) {
 		rgb = this.hexToRGB(color);
+		pos = (x + y * this.width) * 4;
 
+		this.imagedata.data[pos+0] = rgb.r;
+		this.imagedata.data[pos+1] = rgb.g;
+		this.imagedata.data[pos+2] = rgb.b;
+		this.imagedata.data[pos+3] = 0xff;
+	}
+	
+	this.getPixel = function(x, y) {
+		pos = (x + y * this.width) * 4;
+		var rgb = {
+			r: this.imagedata.data[pos+0],
+			g: this.imagedata.data[pos+1],
+			b: this.imagedata.data[pos+2]
+		};
+		
+		return this.RGBToHex(rgb);
+	}
+	
+	this.copyPixels = function(sourceBitmapData, sourceRect, destPoint, alphaBitmapData, alphaPoint, mergeAlpha) {
+		for (y = 0; y < sourceRect.height; y++) {
+			for (x = 0; x < sourceRect.width; x++) {
+				this.setPixel(destPoint.x+x, destPoint.y+y, sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y));
+			}
+		}
+	}
+	
+	this.fillRect = function(rect, color) {
 		for (y = rect.y; y < rect.y+rect.height; y++) {
 			for (x = rect.x; x < rect.x+rect.width; x++) {
-				pos = (y*this.width+x)*4;
-				this.imagedata.data[pos+0] = rgb.r;
-				this.imagedata.data[pos+1] = rgb.g;
-				this.imagedata.data[pos+2] = rgb.b;
-				this.imagedata.data[pos+3] = 0xff; // alpha
+				this.setPixel(x, y, color);
 			}
 		}	
 	}
@@ -89,26 +112,7 @@ function BitmapData (width, height, transparent, fillColor) {
 
 	}
 	
-	this.setPixel = function(x, y, color) {
-		rgb = this.hexToRGB(color);
-		pos = (x + y * this.width) * 4;
-
-		this.imagedata.data[pos+0] = rgb.r;
-		this.imagedata.data[pos+1] = rgb.g;
-		this.imagedata.data[pos+2] = rgb.b;
-		this.imagedata.data[pos+3] = 0xff;
-	}
 	
-	this.getPixel = function(x, y) {
-		pos = (x + y * this.width) * 4;
-		var rgb = {
-			r: this.imagedata.data[pos+0],
-			g: this.imagedata.data[pos+1],
-			b: this.imagedata.data[pos+2]
-		};
-		
-		return this.RGBToHex(rgb);
-	}
 		
 	this.fillRect(this.rect, fillColor);
 	return this;

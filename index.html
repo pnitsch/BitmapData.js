@@ -6,25 +6,25 @@
 		<script type="text/javascript" src="BitmapData.js"></script>
 	</head> 
 	<body> 
-		<canvas id="canvas" width="100" height="100"></canvas>
+		<canvas id="canvas" width="400" height="400"></canvas>
 		<script> 
 			var canvas = document.getElementById("canvas");
 			var context = canvas.getContext("2d");
 		
-			var bmd = new BitmapData(100, 100, true, 0xff2200);
+			var bmd = new BitmapData(300, 300, true, 0xff0000);
 
 			for(i=0; i<canvas.width; i++) {
 				bmd.setPixel(i, i, 0x00ff00);
 			}
 			
 			bmd.fillRect(new Rectangle(20, 20, 20, 20), 0x0000ff)
+			bmd.floodFill(20, 2, 0x00ffff);
 			
 			context.putImageData(bmd.data, 0, 0);
-			
-			var bmd2 = bmd.clone();
-			
+
+			var bmd2 = new BitmapData(200, 200, true, 0xffffff);
+			bmd2.copyPixels(bmd, new Rectangle(20, 0, 200, 200), new Point(0, 0), null, null, null);
 			context.putImageData(bmd2.data, 40, 40);
-			
 		</script> 
 	</body> 
 </html>
