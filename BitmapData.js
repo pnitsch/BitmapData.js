@@ -60,32 +60,32 @@ function BitmapData (width, height, transparent, fillColor) {
 		var searchBmp = new BitmapData(this.width, this.height, true, 0xffffff);
 		var currPoint, newPoint;
 	
-	    while (queue.length > 0) {
-	        currPoint = queue.shift();
-	        ++iterations;
+		while (queue.length > 0) {
+			currPoint = queue.shift();
+			++iterations;
 
-	        if (currPoint.x < 0 || currPoint.x >= this.width) continue;
-	        if (currPoint.y < 0 || currPoint.y >= this.height) continue;
+			if (currPoint.x < 0 || currPoint.x >= this.width) continue;
+			if (currPoint.y < 0 || currPoint.y >= this.height) continue;
 
-	        searchBmp.setPixel(currPoint.x, currPoint.y, 0x00);
+			searchBmp.setPixel(currPoint.x, currPoint.y, 0x00);
 
-	        if (this.getPixel(currPoint.x, currPoint.y) == old) {
-	            this.setPixel(currPoint.x, currPoint.y, color);
+			if (this.getPixel(currPoint.x, currPoint.y) == old) {
+				this.setPixel(currPoint.x, currPoint.y, color);
 
-	            if (searchBmp.getPixel(currPoint.x + 1, currPoint.y) == 0xffffff) {
-	                queue.push(new Point(currPoint.x + 1, currPoint.y));
-	            } 
+				if (searchBmp.getPixel(currPoint.x + 1, currPoint.y) == 0xffffff) {
+					queue.push(new Point(currPoint.x + 1, currPoint.y));
+				} 
 				if (searchBmp.getPixel(currPoint.x, currPoint.y + 1) == 0xffffff) {
-	                queue.push(new Point(currPoint.x, currPoint.y + 1));
-	            } 
+					queue.push(new Point(currPoint.x, currPoint.y + 1));
+				} 
 				if (searchBmp.getPixel(currPoint.x - 1, currPoint.y) == 0xffffff) {
-	                queue.push(new Point(currPoint.x - 1, currPoint.y));
-	            } 
+					queue.push(new Point(currPoint.x - 1, currPoint.y));
+				} 
 				if (searchBmp.getPixel(currPoint.x, currPoint.y - 1) == 0xffffff) {
-	                queue.push(new Point(currPoint.x, currPoint.y - 1));
-	            }
-	        }
-	    }       
+					queue.push(new Point(currPoint.x, currPoint.y - 1));
+				}
+			}
+		}       
 
 	}
 	
