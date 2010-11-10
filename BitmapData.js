@@ -53,15 +53,14 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.floodFill = function(x, y, color) {
 		var queue = new Array();
 		queue.push(new Point(x, y));
-		
+
 		var old = this.getPixel(x, y);
 		var iterations = 0;
-		
+
 		var searchBmp = new BitmapData(this.width, this.height, true, 0xffffff);
-	    var currPoint, newPoint;
+		var currPoint, newPoint;
 	
-	    while (queue.length > 0)
-	    {
+	    while (queue.length > 0) {
 	        currPoint = queue.shift();
 	        ++iterations;
 
@@ -70,40 +69,34 @@ function BitmapData (width, height, transparent, fillColor) {
 
 	        searchBmp.setPixel(currPoint.x, currPoint.y, 0x00);
 
-	        if (this.getPixel(currPoint.x, currPoint.y) == old)
-	        {
+	        if (this.getPixel(currPoint.x, currPoint.y) == old) {
 	            this.setPixel(currPoint.x, currPoint.y, color);
 
-	            if (searchBmp.getPixel(currPoint.x + 1, currPoint.y) == 0xffffff)
-	            {
+	            if (searchBmp.getPixel(currPoint.x + 1, currPoint.y) == 0xffffff) {
 	                queue.push(new Point(currPoint.x + 1, currPoint.y));
-	            }
-	            if (searchBmp.getPixel(currPoint.x, currPoint.y + 1) == 0xffffff)
-	            {
+	            } 
+				if (searchBmp.getPixel(currPoint.x, currPoint.y + 1) == 0xffffff) {
 	                queue.push(new Point(currPoint.x, currPoint.y + 1));
-	            }
-	            if (searchBmp.getPixel(currPoint.x - 1, currPoint.y) == 0xffffff)
-	            {
+	            } 
+				if (searchBmp.getPixel(currPoint.x - 1, currPoint.y) == 0xffffff) {
 	                queue.push(new Point(currPoint.x - 1, currPoint.y));
-	            }
-	            if (searchBmp.getPixel(currPoint.x, currPoint.y - 1) == 0xffffff)
-	            {
+	            } 
+				if (searchBmp.getPixel(currPoint.x, currPoint.y - 1) == 0xffffff) {
 	                queue.push(new Point(currPoint.x, currPoint.y - 1));
 	            }
 	        }
-
 	    }       
 
 	}
 	
 	this.setPixel = function(x, y, color) {
 		rgb = this.hexToRGB(color);
-	    pos = (x + y * this.width) * 4;
-	
-	    this.imagedata.data[pos+0] = rgb.r;
-	    this.imagedata.data[pos+1] = rgb.g;
-	    this.imagedata.data[pos+2] = rgb.b;
-	    this.imagedata.data[pos+3] = 0xff;
+		pos = (x + y * this.width) * 4;
+
+		this.imagedata.data[pos+0] = rgb.r;
+		this.imagedata.data[pos+1] = rgb.g;
+		this.imagedata.data[pos+2] = rgb.b;
+		this.imagedata.data[pos+3] = 0xff;
 	}
 	
 	this.getPixel = function(x, y) {
