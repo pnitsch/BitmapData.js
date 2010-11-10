@@ -19,11 +19,11 @@
 			
 			bmd.fillRect(new Rectangle(20, 20, 20, 20), 0x0000ff)
 			
-			context.putImageData(bmd.getPixels(), 0, 0);
+			context.putImageData(bmd.data, 0, 0);
 			
 			var bmd2 = bmd.clone();
 			
-			context.putImageData(bmd2.getPixels(), 40, 40);
+			context.putImageData(bmd2.data, 40, 40);
 			
 		</script> 
 	</body> 

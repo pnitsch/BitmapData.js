@@ -13,8 +13,7 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.context = this.canvas.getContext("2d");
 	
 	this.imagedata = this.context.createImageData(this.width, this.height);
-	this.__defineGetter__("data", function() { 
-		return this.imagedata; });  	
+	this.__defineGetter__("data", function() { return this.imagedata; });  	
 	
 	this.hexToRGB = function(hex) {
 		var rgb = {
