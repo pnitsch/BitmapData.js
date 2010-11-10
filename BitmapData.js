@@ -117,25 +117,3 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.fillRect(this.rect, fillColor);
 	return this;
 };
-
-function Rectangle (x, y, width, height) {
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.topLeft;
-	
-	return this;
-}
-
-function Point (x, y) {
-	this.x = x;
-	this.y = y;
-	this.length = Math.sqrt(x*x + y*y);
-	
-	this.clone = function() {
-		return new Point(this.x, this.y);
-	}
-	
-	return this;
-}
