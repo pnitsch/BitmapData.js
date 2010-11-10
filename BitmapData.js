@@ -11,16 +11,23 @@ function BitmapData (width, height, transparent, fillColor) {
 	
 	this.canvas = document.createElement("canvas");
 	this.context = this.canvas.getContext("2d");
+	
 	this.imagedata = this.context.createImageData(this.width, this.height);
+	this.__defineGetter__("data", function() { 
+		return this.imagedata; });  	
 	
 	this.hexToRGB = function(hex) {
-		var rgbObj = {
+		var rgb = {
 			r: ((hex & 0xff0000) >> 16),
 			g: ((hex & 0x00ff00) >> 8),
 			b: ((hex & 0x0000ff))
 		};
 
-		return rgbObj;
+		return rgb;
+	}
+	
+	this.RGBToHex = function(rgb) {
+		return rgb.r<<16 | rgb.g<<8 | rgb.b;
 	}
 	
 	this.clone = function() {
@@ -30,22 +37,18 @@ function BitmapData (width, height, transparent, fillColor) {
 		return bmd;
 	}
 	
-	this.getPixels = function() {
-		return this.imagedata;
-	}
-	
 	this.fillRect = function(rect, color) {
 		rgb = this.hexToRGB(color);
-		
+
 		for (y = rect.y; y < rect.y+rect.height; y++) {
-	        for (x = rect.x; x < rect.x+rect.width; x++) {
+			for (x = rect.x; x < rect.x+rect.width; x++) {
 				pos = (y*this.width+x)*4;
-	            this.imagedata.data[pos+0] = rgb.r;
-	            this.imagedata.data[pos+1] = rgb.g;
-	            this.imagedata.data[pos+2] = rgb.b;
-	            this.imagedata.data[pos+3] = 0xff; // alpha
-	        }
-	    }	
+				this.imagedata.data[pos+0] = rgb.r;
+				this.imagedata.data[pos+1] = rgb.g;
+				this.imagedata.data[pos+2] = rgb.b;
+				this.imagedata.data[pos+3] = 0xff; // alpha
+			}
+		}	
 	}
 	
 	this.setPixel = function(x, y, color) {
@@ -58,6 +61,17 @@ function BitmapData (width, height, transparent, fillColor) {
 	    this.imagedata.data[pos+3] = 0xff;
 	}
 	
+	this.getPixel = function(x, y) {
+		pos = (x + y * this.width) * 4;
+		var rgb = {
+			r: this.imagedata.data[pos+0],
+			g: this.imagedata.data[pos+1],
+			b: this.imagedata.data[pos+2]
+		};
+		
+		return this.RGBToHex(rgb);
+	}
+		
 	this.fillRect(this.rect, fillColor);
 	return this;
 };
