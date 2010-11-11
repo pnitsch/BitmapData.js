@@ -10,20 +10,16 @@
 	<body> 
 		<canvas id="canvas" width="300" height="300"></canvas>
 		<script> 
-			var canvas = document.getElementById("canvas");
-			var context = canvas.getContext("2d");
-			
-			var img = new Image();
-			img.onload = function() {
-				var bmd = new BitmapData(300, 300, false, 0xff0000);
-				bmd.draw(this);
-				bmd.fillRect(new Rectangle(20, 20, 50, 50), 0x0000ff);
-				
-				context.putImageData(bmd.data, 0, 0);
+			canvas = document.getElementById("canvas");
+			context = canvas.getContext("2d");
+
+			bmd = new BitmapData(300, 300, false, 0xff0000);
+			bmd.fillRect(new Rectangle(50, 50, 200, 200), 0x0000ff);
+			for(i=0; i<bmd.width; i++) {
+				bmd.setPixel(i, i, 0xff00ff);
 			}
-			img.src = "res/Lenna.png";
 			
-			
+			context.putImageData(bmd.data, 0, 0);
 		</script> 
 	</body> 
 </html>
