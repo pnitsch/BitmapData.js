@@ -60,7 +60,7 @@ function BitmapData (width, height, transparent, fillColor) {
 	
 	this.clone = function() {
 		this.context.putImageData(this.imagedata, 0, 0);
-		var bmd = new BitmapData(this.width, this.height, this.transparent, 0xffffff);
+		var bmd = new BitmapData(this.width, this.height, this.transparent);
 		bmd.data = this.context.getImageData(0, 0, this.width, this.height);
 		return bmd;
 	}
@@ -92,7 +92,6 @@ function BitmapData (width, height, transparent, fillColor) {
 	}
 	
 	this.draw = function(source) {
-		console.log(source);
 		if(source instanceof Image) {
 			console.log("hit");
 			this.canvas.width = source.width;
