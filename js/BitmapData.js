@@ -7,13 +7,14 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.width = width;
 	this.height = height;
 	this.rect = new Rectangle(0, 0, this.width, this.height);
-	this.transparent = transparent;
+	this.transparent = transparent || false;
 	
 	this.canvas = document.createElement("canvas");
 	this.context = this.canvas.getContext("2d");
 	
 	this.imagedata = this.context.createImageData(this.width, this.height);
 	this.__defineGetter__("data", function() { return this.imagedata; });  	
+	this.__defineSetter__("data", function(source) { this.imagedata = source; });
 	
 	this.hexToRGB = function(hex) {
 		var rgb = {
@@ -32,7 +33,7 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.clone = function() {
 		this.context.putImageData(this.imagedata, 0, 0);
 		var bmd = new BitmapData(this.width, this.height, this.transparent, 0xffffff);
-		bmd.imagedata = this.context.getImageData(0, 0, this.width, this.height);
+		bmd.data = this.context.getImageData(0, 0, this.width, this.height);
 		return bmd;
 	}
 	
@@ -63,6 +64,19 @@ function BitmapData (width, height, transparent, fillColor) {
 				this.setPixel(destPoint.x+x, destPoint.y+y, sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y));
 			}
 		}
+	}
+	
+	this.draw = function(source) {
+		if(source instanceof Image) {
+			this.canvas.width = source.width;
+			this.canvas.height = source.height;
+			
+			this.context.drawImage(source, 0, 0, source.width, source.height);
+			
+			var sourceBitmapData = new BitmapData(source.width, source.height);
+			sourceBitmapData.data = this.context.getImageData(0, 0, source.width, source.height);
+			this.copyPixels(sourceBitmapData, sourceBitmapData.rect, new Point());
+		}		
 	}
 	
 	this.fillRect = function(rect, color) {
@@ -112,8 +126,6 @@ function BitmapData (width, height, transparent, fillColor) {
 
 	}
 	
-	
-		
-	this.fillRect(this.rect, fillColor);
+	if(fillColor) this.fillRect(this.rect, fillColor);
 	return this;
 };
