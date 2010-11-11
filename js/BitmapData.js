@@ -111,7 +111,6 @@ function BitmapData (width, height, transparent, fillColor) {
 	
 	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
 		if(source instanceof Image) {
-			console.log("hit");
 			this.canvas.width = source.width;
 			this.canvas.height = source.height;
 			
