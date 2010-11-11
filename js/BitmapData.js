@@ -3,6 +3,24 @@
  * HTML5 Canvas API implementation of Flash BitmapData class
  */
 
+var BlendMode = new function() {
+	this.ADD = "add"
+	this.ALPHA = "alpha"
+	this.DARKEN = "darken"
+	this.DIFFERENCE = "difference"
+	this.ERASE "erase"
+	this.HARDLIGHT "hardlight"
+	this.INVERT "invert"
+	this.LAYER "layer"
+	this.LIGHTEN "lighten"
+	this.MULTIPLY "multiply"
+	this.NORMAL "normal"
+	this.OVERLAY "overlay"
+	this.SCREEN "screen"
+	this.SHADER "shader"
+	this.SUBTRACT "subtract"
+};
+
 var BitmapDataChannel = new function() {
 	this.ALPHA = 24;
 	this.BLUE = 1;
