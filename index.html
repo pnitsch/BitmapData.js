@@ -1,25 +1,70 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head> 
-		<title>BitmapData.js Example</title> 
+		<title>BitmapData.js</title> 
 		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
 		<script type="text/javascript" src="js/Point.js"></script>
 		<script type="text/javascript" src="js/Rectangle.js"></script>
 		<script type="text/javascript" src="js/BitmapData.js"></script>
-	</head> 
-	<body> 
-		<canvas id="canvas" width="300" height="300"></canvas>
 		<script> 
-			canvas = document.getElementById("canvas");
-			context = canvas.getContext("2d");
+			function init(){
+				canvas = document.getElementById("canvas");
+				context = canvas.getContext("2d");
 
-			bmd = new BitmapData(300, 300, false, 0xff0000);
-			bmd.fillRect(new Rectangle(50, 50, 200, 200), 0x0000ff);
-			for(i=0; i<bmd.width; i++) {
-				bmd.setPixel(i, i, 0xff00ff);
-			}
-			
-			context.putImageData(bmd.data, 0, 0);
-		</script> 
+				bmd = new BitmapData(256, 256, false, 0xff0000);
+
+				color = 0x000000;
+				for(y=0; y<bmd.height; y++) {
+					for(x=0; x<bmd.width; x++) {
+						bmd.setPixel(x, y, color+=0xff);
+					}
+				}
+				
+				bmd.fillRect(new Rectangle(156, 156, 100, 100), 0xdd00dd);
+	
+				context.putImageData(bmd.data, 0, 0);
+			};	
+		</script>
+	</head> 
+	<body onload="init();"> 
+		<div id="container">
+			<div id="title">BitmapData.js</div>
+			<div id="description">
+				<a href="https://github.com/pnitsch/BitmapData.js">github</a>
+				<p>HTML5 Canvas API implementation of the AS3 BitmapData class.</p>
+				<p></p></div>
+			<div id="example-container">
+				<div class="example">
+					<canvas id="canvas" width="256" height="256"></canvas>
+				</div> 
+				<div class="code">
+					<pre>
+canvas = document.getElementById("canvas");
+context = canvas.getContext("2d");
+
+bmd = new BitmapData(256, 256, false, 0xff0000);
+
+color = 0x000000;
+for(y=0; y&lt;bmd.height; y++) {
+	for(x=0; x&lt;bmd.width; x++) {
+		bmd.setPixel(x, y, color+=0xff);
+	}
+}
+
+bmd.fillRect(new Rectangle(156, 156, 100, 100), 0xdd00dd);
+
+context.putImageData(bmd.data, 0, 0);
+					</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="channels.html">BitmapDataChannel example</a></li>
+					<li><a href="plasma.html">Plasma example</a></li>
+				</ul>
+			</div>
+		</div>
 	</body> 
 </html>

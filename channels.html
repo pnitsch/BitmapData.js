@@ -1,8 +1,9 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head> 
-		<title>BitmapData.js Channels</title> 
+		<title>BitmapDataChannels Example</title> 
 		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
 		<script type="text/javascript" src="js/Point.js"></script>
 		<script type="text/javascript" src="js/Rectangle.js"></script>
 		<script type="text/javascript" src="js/BitmapData.js"></script>
@@ -28,8 +29,40 @@
 		</script>
 	</head> 
 	<body onload="init();"> 
-		<canvas id="canvas" width="300" height="300"></canvas><br>
-		<img id="bikes" src="res/bikes.png" width="150" height="150" />
-		<img id="lenna" src="res/Lenna.png" width="150" height="150" />
+		<div id="container">
+			<div id="example-container">
+				<div class="example">
+					<canvas id="canvas" width="300" height="300"></canvas><br>
+					<img id="bikes" src="res/bikes.png" width="150" height="150" />
+					<img id="lenna" src="res/Lenna.png" width="150" height="150" />
+				</div> 
+				<div class="code">
+					<pre>
+canvas = document.getElementById("canvas");
+context = canvas.getContext("2d");
+
+bikes = new Image();
+bikes.src = "res/bikes.png";
+bikesData = new BitmapData(300, 300);
+bikesData.draw(bikes);
+
+lenna = new Image();
+lenna.src = "res/Lenna.png";
+leenaData = new BitmapData(512, 512);
+leenaData.draw(lenna);
+
+bikesData.copyChannel(leenaData, new Rectangle(150, 150, 200, 200), new Point(50, 50), BitmapDataChannel.RED, BitmapDataChannel.GREEN);
+
+context.putImageData(bikesData.data, 0, 0);
+					</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="index.html">back</a></li>
+				</ul>
+			</div>
+		</div>
 	</body> 
 </html>
