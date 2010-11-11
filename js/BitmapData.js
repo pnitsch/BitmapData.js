@@ -3,6 +3,13 @@
  * HTML5 Canvas API implementation of Flash BitmapData class
  */
 
+var BitmapDataChannel = new function() {
+	this.ALPHA = 24;
+	this.BLUE = 1;
+	this.GREEN = 8;
+	this.RED = 16;
+};
+
 function BitmapData (width, height, transparent, fillColor) {
 	this.width = width;
 	this.height = height;
@@ -30,13 +37,6 @@ function BitmapData (width, height, transparent, fillColor) {
 		return rgb.r<<16 | rgb.g<<8 | rgb.b;
 	}
 	
-	this.clone = function() {
-		this.context.putImageData(this.imagedata, 0, 0);
-		var bmd = new BitmapData(this.width, this.height, this.transparent, 0xffffff);
-		bmd.data = this.context.getImageData(0, 0, this.width, this.height);
-		return bmd;
-	}
-	
 	this.setPixel = function(x, y, color) {
 		rgb = this.hexToRGB(color);
 		pos = (x + y * this.width) * 4;
@@ -58,6 +58,31 @@ function BitmapData (width, height, transparent, fillColor) {
 		return this.RGBToHex(rgb);
 	}
 	
+	this.clone = function() {
+		this.context.putImageData(this.imagedata, 0, 0);
+		var bmd = new BitmapData(this.width, this.height, this.transparent, 0xffffff);
+		bmd.data = this.context.getImageData(0, 0, this.width, this.height);
+		return bmd;
+	}
+	
+	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
+		for (y = 0; y < sourceRect.height; y++) {
+			for (x = 0; x < sourceRect.width; x++) {
+				sourceColor = sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y);
+				channelValue = sourceColor >> sourceChannel;
+				rgb = this.hexToRGB( this.getPixel(destPoint.x+x, destPoint.y+y) ); // redundancy
+				
+				switch(destChannel){
+					case BitmapDataChannel.RED: rgb.r = channelValue; break;
+					case BitmapDataChannel.GREEN: rgb.g = channelValue; break;
+					case BitmapDataChannel.BLUE: rgb.b = channelValue; break;
+				}
+				
+				this.setPixel(destPoint.x+x, destPoint.y+y, this.RGBToHex(rgb));
+			}
+		}
+	}
+	
 	this.copyPixels = function(sourceBitmapData, sourceRect, destPoint, alphaBitmapData, alphaPoint, mergeAlpha) {
 		for (y = 0; y < sourceRect.height; y++) {
 			for (x = 0; x < sourceRect.width; x++) {
@@ -67,7 +92,9 @@ function BitmapData (width, height, transparent, fillColor) {
 	}
 	
 	this.draw = function(source) {
+		console.log(source);
 		if(source instanceof Image) {
+			console.log("hit");
 			this.canvas.width = source.width;
 			this.canvas.height = source.height;
 			
@@ -76,6 +103,12 @@ function BitmapData (width, height, transparent, fillColor) {
 			var sourceBitmapData = new BitmapData(source.width, source.height);
 			sourceBitmapData.data = this.context.getImageData(0, 0, source.width, source.height);
 			this.copyPixels(sourceBitmapData, sourceBitmapData.rect, new Point());
+			
+		} else if(source instanceof BitmapData) {
+			
+			sourceBitmapData.data = this.context.getImageData(0, 0, source.width, source.height);
+			this.copyPixels(sourceBitmapData, sourceBitmapData.rect, new Point());
+		
 		}		
 	}
 	
@@ -129,3 +162,4 @@ function BitmapData (width, height, transparent, fillColor) {
 	if(fillColor) this.fillRect(this.rect, fillColor);
 	return this;
 };
+
