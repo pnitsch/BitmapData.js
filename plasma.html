@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title>BitmapData.js Plasma</title> 
+		<meta charset="utf-8">
+		<script type="text/javascript" src="js/Point.js"></script>
+		<script type="text/javascript" src="js/Rectangle.js"></script>
+		<script type="text/javascript" src="js/BitmapData.js"></script>
+	</head> 
+	<body> 
+		<canvas id="canvas" width="200" height="200"></canvas>
+		<script> 
+			var canvas = document.getElementById("canvas");
+			var context = canvas.getContext("2d");
+			
+			function dist(a, b, c, d) {
+				return Math.sqrt(((a - c) * (a - c) + (b - d) * (b - d)));
+			}
+			
+			var bmd = new BitmapData(200, 200, false, 0xff0000);
+			
+			setInterval(function(){
+				time = new Date().getTime()/50;
+				
+				for(y=0; y<bmd.height; y++) {
+					for(x=0; x<bmd.width; x++) {
+						rgb = Math.sin(dist(x + time, y, 128.0, 128.0) / 8.0)
+							+ Math.sin(dist(x, y, 64.0, 64.0) / 8.0)
+							+ Math.sin(dist(x, y + time / 7, 192.0, 64) / 7.0)
+							+ Math.sin(dist(x, y, 192.0, 100.0) / 8.0);
+						
+						color = parseInt(4+rgb)*32;
+						bmd.setPixel(x, y, color<<16 | (color*2)<<8 | 255-color);
+					}
+				}
+
+				context.putImageData(bmd.data, 0, 0);
+			}, 10);
+			
+		</script> 
+	</body> 
+</html>
