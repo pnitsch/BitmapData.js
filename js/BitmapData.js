@@ -1,6 +1,6 @@
 /*
- * BitmapData.js by Peter Nitsch
- * HTML5 Canvas API implementation of Flash BitmapData class
+ * BitmapData.js by Peter Nitsch - https://github.com/pnitsch/BitmapData.js
+ * HTML5 Canvas API implementation of the AS3 BitmapData class. 
  */
 
 var BlendMode = new function() {
@@ -109,7 +109,7 @@ function BitmapData (width, height, transparent, fillColor) {
 		}
 	}
 	
-	this.draw = function(source) {
+	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
 		if(source instanceof Image) {
 			console.log("hit");
 			this.canvas.width = source.width;
@@ -117,7 +117,7 @@ function BitmapData (width, height, transparent, fillColor) {
 			
 			this.context.drawImage(source, 0, 0, source.width, source.height);
 			
-			var sourceBitmapData = new BitmapData(source.width, source.height);
+			sourceBitmapData = new BitmapData(source.width, source.height);
 			sourceBitmapData.data = this.context.getImageData(0, 0, source.width, source.height);
 			this.copyPixels(sourceBitmapData, sourceBitmapData.rect, new Point());
 			
