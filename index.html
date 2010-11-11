@@ -12,26 +12,13 @@
 		<script> 
 			var canvas = document.getElementById("canvas");
 			var context = canvas.getContext("2d");
-		
-			var bmd = new BitmapData(300, 300, false, 0xff0000);
-
-			//for(i=0; i<canvas.width; i++) {
-			//	bmd.setPixel(i, i, 0x00ff00);
-			//}
-			
-			//bmd.fillRect(new Rectangle(20, 20, 20, 20), 0x0000ff)
-			//bmd.floodFill(20, 2, 0x00ffff);
-			
-			//context.putImageData(bmd.data, 0, 0);
-
-			//var bmd2 = new BitmapData(200, 200);
-			//bmd2.copyPixels(bmd, new Rectangle(20, 0, 200, 200), new Point(0, 0), null, null, null);
-			
 			
 			var img = new Image();
 			img.onload = function() {
+				var bmd = new BitmapData(300, 300, false, 0xff0000);
 				bmd.draw(this);
 				bmd.fillRect(new Rectangle(20, 20, 50, 50), 0x0000ff);
+				
 				context.putImageData(bmd.data, 0, 0);
 			}
 			img.src = "res/Lenna.png";
