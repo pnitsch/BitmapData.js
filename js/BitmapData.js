@@ -4,21 +4,21 @@
  */
 
 var BlendMode = new function() {
-	this.ADD = "add"
-	this.ALPHA = "alpha"
-	this.DARKEN = "darken"
-	this.DIFFERENCE = "difference"
-	this.ERASE "erase"
-	this.HARDLIGHT "hardlight"
-	this.INVERT "invert"
-	this.LAYER "layer"
-	this.LIGHTEN "lighten"
-	this.MULTIPLY "multiply"
-	this.NORMAL "normal"
-	this.OVERLAY "overlay"
-	this.SCREEN "screen"
-	this.SHADER "shader"
-	this.SUBTRACT "subtract"
+	this.ADD = "add";
+	this.ALPHA = "alpha";
+	this.DARKEN = "darken";
+	this.DIFFERENCE = "difference";
+	this.ERASE = "erase";
+	this.HARDLIGHT = "hardlight";
+	this.INVERT = "invert";
+	this.LAYER = "layer";
+	this.LIGHTEN = "lighten";
+	this.MULTIPLY = "multiply";
+	this.NORMAL = "normal";
+	this.OVERLAY = "overlay";
+	this.SCREEN = "screen";
+	this.SHADER = "shader";
+	this.SUBTRACT = "subtract";
 };
 
 var BitmapDataChannel = new function() {
@@ -110,22 +110,25 @@ function BitmapData (width, height, transparent, fillColor) {
 	}
 	
 	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
-		if(source instanceof Image) {
-			this.canvas.width = source.width;
-			this.canvas.height = source.height;
-			
-			this.context.drawImage(source, 0, 0, source.width, source.height);
-			
-			sourceBitmapData = new BitmapData(source.width, source.height);
-			sourceBitmapData.data = this.context.getImageData(0, 0, source.width, source.height);
-			this.copyPixels(sourceBitmapData, sourceBitmapData.rect, new Point());
-			
-		} else if(source instanceof BitmapData) {
-			
-			sourceBitmapData.data = this.context.getImageData(0, 0, source.width, source.height);
-			this.copyPixels(sourceBitmapData, sourceBitmapData.rect, new Point());
+
+		/*
+		 * currently only supports Image object
+		 * TODO: implement instanceof switches
+		 */
 		
-		}		
+		var sourceMatrix = matrix || new Matrix();
+		var sourceRect = clipRect || new Rectangle(0, 0, source.width, source.height);
+		
+		this.canvas.width = (source.width*matrix.a) - matrix.tx;
+		this.canvas.height = (source.height*matrix.d) - matrix.ty;
+		
+		this.context.drawImage(source, 
+			0, 0, source.width, source.height, 
+			matrix.tx, 0, source.width*matrix.a, source.height*matrix.d);
+			
+		var sourceBitmapData = new BitmapData(this.canvas.width, this.canvas.height);
+		sourceBitmapData.data = this.context.getImageData(0, 0, sourceBitmapData.width, sourceBitmapData.height);
+		this.copyPixels(sourceBitmapData, sourceRect, new Point(sourceRect.x, sourceRect.y));	
 	}
 	
 	this.fillRect = function(rect, color) {
