@@ -119,12 +119,12 @@ function BitmapData (width, height, transparent, fillColor) {
 		var sourceMatrix = matrix || new Matrix();
 		var sourceRect = clipRect || new Rectangle(0, 0, source.width, source.height);
 		
-		this.canvas.width = (source.width*matrix.a) - matrix.tx;
-		this.canvas.height = (source.height*matrix.d) - matrix.ty;
+		this.canvas.width = (source.width*sourceMatrix.a) - sourceMatrix.tx;
+		this.canvas.height = (source.height*sourceMatrix.d) - sourceMatrix.ty;
 		
 		this.context.drawImage(source, 
 			0, 0, source.width, source.height, 
-			matrix.tx, 0, source.width*matrix.a, source.height*matrix.d);
+			sourceMatrix.tx, sourceMatrix.ty, source.width*sourceMatrix.a, source.height*sourceMatrix.d);
 			
 		var sourceBitmapData = new BitmapData(this.canvas.width, this.canvas.height);
 		sourceBitmapData.data = this.context.getImageData(0, 0, sourceBitmapData.width, sourceBitmapData.height);
