@@ -31,8 +31,8 @@ a:hover {
 }
 
 .code pre {
-	font-family: Monaco, "Courier New", fixed;
-	font-size: 10px;
+	font-family: Courier, fixed;
+	font-size: 12px;
 }
 
 .break {

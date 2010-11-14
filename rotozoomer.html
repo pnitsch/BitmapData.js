@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title>Rotozoomer Example</title> 
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
+		<script type="text/javascript" src="js/Point.js"></script>
+		<script type="text/javascript" src="js/Rectangle.js"></script>
+		<script type="text/javascript" src="js/Matrix.js"></script>
+		<script type="text/javascript" src="js/BitmapData.js"></script>
+		<script> 
+			function init(){
+				canvas = document.getElementById("canvas");
+				context = canvas.getContext("2d");
+
+				lenna = new Image();
+				lenna.src = "res/Lenna.png";
+				leenaData = new BitmapData(400, 400, 0, 0xff0000);
+				
+				clipping = new Rectangle(10, 10, 380, 380);
+				rotoMatrix = new Matrix(1, 0, 0, 1, 200, 200);
+				
+				zoomMax = 0.2;
+				zoomMin = -0.4;
+				dz = 0.015;
+				dr= 0.01;
+				angle = 0;
+				zoom = zoomMin;
+				isZoomIncreasing = true;
+				
+				setInterval(function() {
+					if ( isZoomIncreasing )	zoom = zoom + dz;
+					else zoom = zoom - dz;	
+
+					angle = angle + dr;
+
+					if ( angle > 360 ) angle = 0;
+
+					if ( zoom > zoomMax ) {
+						isZoomIncreasing = false;
+						zoom = zoomMax;
+					} else if ( zoom < zoomMin ) {
+						isZoomIncreasing = true;
+						zoom = zoomMin;
+					}
+
+					rotoMatrix.a = Math.cos(angle) * zoom;
+					rotoMatrix.b = Math.sin(angle);
+					rotoMatrix.c = -Math.sin(angle);
+					rotoMatrix.d = Math.cos(angle) * zoom;
+					
+					leenaData.draw(lenna, rotoMatrix, null, null, clipping);
+					context.putImageData(leenaData.data, 0, 0);
+				}, 20);
+			};	
+		</script>
+	</head> 
+	<body onload="init();"> 
+		<div id="container">
+			<div id="example-container">
+				<div class="example">
+					<canvas id="canvas" width="400" height="400"></canvas><br>
+					<img id="lenna" src="res/Lenna.png" width="150" height="150" />
+				</div> 
+				<div class="code">
+					<pre>
+canvas = document.getElementById("canvas");
+context = canvas.getContext("2d");
+
+lenna = new Image();
+lenna.src = "res/Lenna.png";
+leenaData = new BitmapData(400, 400, 0, 0xff0000);
+
+clipping = new Rectangle(10, 10, 380, 380);
+rotoMatrix = new Matrix(1, 0, 0, 1, 200, 200);
+
+zoomMax = 0.2;
+zoomMin = -0.4;
+dz = 0.015;
+dr = 0.01;
+angle = 0;
+zoom = zoomMin;
+isZoomIncreasing = true;
+
+setInterval(function() {
+	if ( isZoomIncreasing )	zoom = zoom + dz;
+	else zoom = zoom - dz;	
+
+	angle = angle + dr;
+
+	if ( angle > 360 ) angle = 0;
+
+	if ( zoom > zoomMax ) {
+		isZoomIncreasing = false;
+		zoom = zoomMax;
+	} else if ( zoom < zoomMin ) {
+		isZoomIncreasing = true;
+		zoom = zoomMin;
+	}
+
+	rotoMatrix.a = Math.cos(angle) * zoom;
+	rotoMatrix.b = Math.sin(angle);
+	rotoMatrix.c = -Math.sin(angle);
+	rotoMatrix.d = Math.cos(angle) * zoom;
+
+	leenaData.draw(lenna, rotoMatrix, null, null, clipping);
+	context.putImageData(leenaData.data, 0, 0);
+}, 20);
+					</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="index.html">back</a></li>
+				</ul>
+			</div>
+		</div>
+	</body> 
+</html>

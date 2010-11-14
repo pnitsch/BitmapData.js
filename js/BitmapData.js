@@ -34,8 +34,13 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.rect = new Rectangle(0, 0, this.width, this.height);
 	this.transparent = transparent || false;
 	
+	this.drawingCanvas = document.createElement("canvas");
+	this.drawingContext = this.drawingCanvas.getContext("2d");
+	
 	this.canvas = document.createElement("canvas");
 	this.context = this.canvas.getContext("2d");
+	this.canvas.setAttribute('width', this.width);
+	this.canvas.setAttribute('height', this.height);
 	
 	this.imagedata = this.context.createImageData(this.width, this.height);
 	this.__defineGetter__("data", function() { return this.imagedata; });  	
@@ -62,7 +67,7 @@ function BitmapData (width, height, transparent, fillColor) {
 		this.imagedata.data[pos+0] = rgb.r;
 		this.imagedata.data[pos+1] = rgb.g;
 		this.imagedata.data[pos+2] = rgb.b;
-		this.imagedata.data[pos+3] = 0xff;
+		this.imagedata.data[pos+3] = 0xff;	
 	}
 	
 	this.getPixel = function(x, y) {
@@ -108,7 +113,7 @@ function BitmapData (width, height, transparent, fillColor) {
 			}
 		}
 	}
-	
+		
 	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
 
 		/*
@@ -116,27 +121,45 @@ function BitmapData (width, height, transparent, fillColor) {
 		 * TODO: implement instanceof switches
 		 */
 		
-		var sourceMatrix = matrix || new Matrix();
-		var sourceRect = clipRect || new Rectangle(0, 0, source.width, source.height);
+		sourceMatrix = matrix || new Matrix();
+		sourceRect = clipRect || new Rectangle(0, 0, source.width, source.height);
 		
-		this.canvas.width = (source.width*sourceMatrix.a) - sourceMatrix.tx;
-		this.canvas.height = (source.height*sourceMatrix.d) - sourceMatrix.ty;
+		this.drawingCanvas.setAttribute('width', source.width);
+		this.drawingCanvas.setAttribute('height', source.height);
 		
-		this.context.drawImage(source, 
-			0, 0, source.width, source.height, 
-			sourceMatrix.tx, sourceMatrix.ty, source.width*sourceMatrix.a, source.height*sourceMatrix.d);
+		this.drawingContext.transform(
+			sourceMatrix.a,
+			sourceMatrix.b,
+			sourceMatrix.c,
+			sourceMatrix.d,
+			sourceMatrix.tx,
+			sourceMatrix.ty);
 			
-		var sourceBitmapData = new BitmapData(this.canvas.width, this.canvas.height);
-		sourceBitmapData.data = this.context.getImageData(0, 0, sourceBitmapData.width, sourceBitmapData.height);
-		this.copyPixels(sourceBitmapData, sourceRect, new Point(sourceRect.x, sourceRect.y));	
+		this.drawingContext.drawImage(source, 
+			0, 0, source.width, source.height, 
+			0, 0, source.width, source.height);
+
+		bw = this.canvas.width - sourceRect.width - sourceRect.x;
+		bh = this.canvas.height - sourceRect.height - sourceRect.y
+
+		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - sourceRect.x) : sourceRect.width;
+		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - sourceRect.y) : sourceRect.height;
+	
+		this.context.putImageData(this.imagedata, 0, 0);
+		this.context.drawImage(this.drawingCanvas, 
+			sourceRect.x, sourceRect.y, dw, dh, 
+			sourceRect.x, sourceRect.y, dw, dh);
+
+		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 	}
 	
 	this.fillRect = function(rect, color) {
-		for (y = rect.y; y < rect.y+rect.height; y++) {
-			for (x = rect.x; x < rect.x+rect.width; x++) {
-				this.setPixel(x, y, color);
-			}
-		}	
+		this.context.putImageData(this.imagedata, 0, 0);
+		rgb = this.hexToRGB(color);
+
+		this.context.fillStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";  
+		this.context.fillRect (rect.x, rect.y, rect.width, rect.height);
+		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 	}
 	
 	this.floodFill = function(x, y, color) {
