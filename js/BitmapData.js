@@ -28,6 +28,10 @@ var BitmapDataChannel = new function() {
 	this.RED = 1;
 };
 
+// RGB <-> Hex conversion
+function hexToRGB (hex) { return { r: ((hex & 0xff0000) >> 16), g: ((hex & 0x00ff00) >> 8), b: ((hex & 0x0000ff)) }; };
+function RGBToHex(rgb) { return rgb.r<<16 | rgb.g<<8 | rgb.b; };
+
 // Park-Miller-Carta Pseudo-Random Number Generator
 function PRNG() {
 	this.seed = 1;
@@ -56,41 +60,25 @@ function BitmapData(width, height, transparent, fillColor) {
 	
 	this.r = new PRNG();
 	
-	this.hexToRGB = function(hex) {
-		var rgb = {
-			r: ((hex & 0xff0000) >> 16),
-			g: ((hex & 0x00ff00) >> 8),
-			b: ((hex & 0x0000ff))
-		};
-
-		return rgb;
-	};
-	
-	this.RGBToHex = function(rgb) {
-		return rgb.r<<16 | rgb.g<<8 | rgb.b;
-	};
-	
 	this.setPixel = function(x, y, color) {
-		rgb = this.hexToRGB(color);
+		rgb = hexToRGB(color);
 		pos = (x + y * this.width) * 4;
 
 		this.imagedata.data[pos+0] = rgb.r;
 		this.imagedata.data[pos+1] = rgb.g;
 		this.imagedata.data[pos+2] = rgb.b;
 		this.imagedata.data[pos+3] = 0xff;	
-		
-		// set back to context
 	};
 	
 	this.getPixel = function(x, y) {
 		pos = (x + y * this.width) * 4;
-		var rgb = {
+		rgb = {
 			r: this.imagedata.data[pos+0],
 			g: this.imagedata.data[pos+1],
 			b: this.imagedata.data[pos+2]
 		};
 		
-		return this.RGBToHex(rgb);
+		return RGBToHex(rgb);
 	};
 	
 	this.clone = function() {
@@ -100,7 +88,34 @@ function BitmapData(width, height, transparent, fillColor) {
 		return bmd;
 	};
 	
+	this.compare = function(otherBitmapData) {
+		if(this.width != otherBitmapData.width) return -3;
+		if(this.height != otherBitmapData.height) return -4;
+		if(this.data === otherBitmapData.data) return 0; 
+		
+		
+		var result = new BitmapData(this.width, this.height);
+		for (y = 0; y < this.height; y++) {
+			for (x = 0; x < this.width; x++) {
+				otherRGB = hexToRGB( otherBitmapData.getPixel(x, y) );
+				thisRGB = hexToRGB( this.getPixel(x, y) );
+				
+				dif = {
+					r: Math.abs(otherRGB.r - thisRGB.r),
+					g: Math.abs(otherRGB.g - thisRGB.g),
+					b: Math.abs(otherRGB.b - thisRGB.b)
+				};
+				
+				result.setPixel(x, y, RGBToHex(dif));
+			}
+		}
+		
+		return result;
+	};
+	
 	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint) {
+		this.context.putImageData(this.imagedata, 0, 0);
+		
 		bw = this.canvas.width - sourceRect.width - destPoint.x;
 		bh = this.canvas.height - sourceRect.height - destPoint.y
 
@@ -118,21 +133,21 @@ function BitmapData(width, height, transparent, fillColor) {
 		for (y = 0; y < sourceRect.height; y++) {
 			for (x = 0; x < sourceRect.width; x++) {
 				sourceColor = sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y);
-				sourceRGB = this.hexToRGB(sourceColor);
+				sourceRGB = hexToRGB(sourceColor);
 				switch(sourceChannel) {
 					case BitmapDataChannel.RED: channelValue = sourceRGB.r; break;
 					case BitmapDataChannel.GREEN: channelValue = sourceRGB.g; break;
 					case BitmapDataChannel.BLUE: channelValue = sourceRGB.b; break;
 				}
 				
-				rgb = this.hexToRGB( this.getPixel(destPoint.x+x, destPoint.y+y) ); // redundancy
+				rgb = hexToRGB( this.getPixel(destPoint.x+x, destPoint.y+y) ); // redundancy
 				switch(destChannel){
 					case BitmapDataChannel.RED: rgb.r = channelValue; break;
 					case BitmapDataChannel.GREEN: rgb.g = channelValue; break;
 					case BitmapDataChannel.BLUE: rgb.b = channelValue; break;
 				}
 				
-				this.setPixel(destPoint.x+x, destPoint.y+y, this.RGBToHex(rgb));
+				this.setPixel(destPoint.x+x, destPoint.y+y, RGBToHex(rgb));
 			}
 		}
 	};
@@ -171,7 +186,7 @@ function BitmapData(width, height, transparent, fillColor) {
 	
 	this.fillRect = function(rect, color) {
 		this.context.putImageData(this.imagedata, 0, 0);
-		rgb = this.hexToRGB(color);
+		rgb = hexToRGB(color);
 
 		this.context.fillStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";  
 		this.context.fillRect (rect.x, rect.y, rect.width, rect.height);
@@ -244,8 +259,6 @@ function BitmapData(width, height, transparent, fillColor) {
 				this.imagedata.data[pos+3] = 0xff;
 			}
 		}	
-		
-		this.context.putImageData(this.imagedata, 0, 0);
 	};
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);
