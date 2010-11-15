@@ -118,9 +118,14 @@ function BitmapData(width, height, transparent, fillColor) {
 		for (y = 0; y < sourceRect.height; y++) {
 			for (x = 0; x < sourceRect.width; x++) {
 				sourceColor = sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y);
-				channelValue = sourceColor >> sourceChannel;
-				rgb = this.hexToRGB( this.getPixel(destPoint.x+x, destPoint.y+y) ); // redundancy
+				sourceRGB = this.hexToRGB(sourceColor);
+				switch(sourceChannel) {
+					case BitmapDataChannel.RED: channelValue = sourceRGB.r; break;
+					case BitmapDataChannel.GREEN: channelValue = sourceRGB.g; break;
+					case BitmapDataChannel.BLUE: channelValue = sourceRGB.b; break;
+				}
 				
+				rgb = this.hexToRGB( this.getPixel(destPoint.x+x, destPoint.y+y) ); // redundancy
 				switch(destChannel){
 					case BitmapDataChannel.RED: rgb.r = channelValue; break;
 					case BitmapDataChannel.GREEN: rgb.g = channelValue; break;
@@ -136,8 +141,6 @@ function BitmapData(width, height, transparent, fillColor) {
 		this.copyCanvas(sourceBitmapData.canvas, sourceRect, destPoint);
 	};
 	
-	
-		
 	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
 
 		/*
