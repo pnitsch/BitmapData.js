@@ -64,11 +64,11 @@ function BitmapData(width, height, transparent, fillColor) {
 		};
 
 		return rgb;
-	}
+	};
 	
 	this.RGBToHex = function(rgb) {
 		return rgb.r<<16 | rgb.g<<8 | rgb.b;
-	}
+	};
 	
 	this.setPixel = function(x, y, color) {
 		rgb = this.hexToRGB(color);
@@ -78,7 +78,9 @@ function BitmapData(width, height, transparent, fillColor) {
 		this.imagedata.data[pos+1] = rgb.g;
 		this.imagedata.data[pos+2] = rgb.b;
 		this.imagedata.data[pos+3] = 0xff;	
-	}
+		
+		// set back to context
+	};
 	
 	this.getPixel = function(x, y) {
 		pos = (x + y * this.width) * 4;
@@ -89,14 +91,14 @@ function BitmapData(width, height, transparent, fillColor) {
 		};
 		
 		return this.RGBToHex(rgb);
-	}
+	};
 	
 	this.clone = function() {
 		this.context.putImageData(this.imagedata, 0, 0);
 		var bmd = new BitmapData(this.width, this.height, this.transparent);
 		bmd.data = this.context.getImageData(0, 0, this.width, this.height);
 		return bmd;
-	}
+	};
 	
 	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
 		for (y = 0; y < sourceRect.height; y++) {
@@ -114,15 +116,44 @@ function BitmapData(width, height, transparent, fillColor) {
 				this.setPixel(destPoint.x+x, destPoint.y+y, this.RGBToHex(rgb));
 			}
 		}
-	}
+	};
 	
 	this.copyPixels = function(sourceBitmapData, sourceRect, destPoint, alphaBitmapData, alphaPoint, mergeAlpha) {
+		
+		/*
+		this.drawingCanvas.setAttribute('width', sourceRect.width);
+		this.drawingCanvas.setAttribute('height', sourceRect.height);
+		
+		this.drawingContext.drawImage(sourceBitmapData.canvas, 
+			0, 0, source.width, source.height, 
+			0, 0, source.width, source.height);
+		*/
+		
+		/*
 		for (y = 0; y < sourceRect.height; y++) {
 			for (x = 0; x < sourceRect.width; x++) {
 				this.setPixel(destPoint.x+x, destPoint.y+y, sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y));
 			}
 		}
-	}
+		*/
+		
+		this.copyCanvas(sourceBitmapData.canvas, sourceRect, destPoint);
+		
+	};
+	
+	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint) {
+		bw = this.canvas.width - sourceRect.width - destPoint.x;
+		bh = this.canvas.height - sourceRect.height - destPoint.y
+
+		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
+		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
+		
+		this.context.drawImage(sourceCanvas, 
+			sourceRect.x, sourceRect.y, dw, dh, 
+			destPoint.x, destPoint.y, dw, dh);
+
+		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+	};
 		
 	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
 
@@ -149,18 +180,22 @@ function BitmapData(width, height, transparent, fillColor) {
 			0, 0, source.width, source.height, 
 			0, 0, source.width, source.height);
 
+/*
 		bw = this.canvas.width - sourceRect.width - sourceRect.x;
 		bh = this.canvas.height - sourceRect.height - sourceRect.y
 
 		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - sourceRect.x) : sourceRect.width;
 		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - sourceRect.y) : sourceRect.height;
 	
-		this.context.putImageData(this.imagedata, 0, 0);
+		this.context.putImageData(this.imagedata, 0, 0); // delete
 		this.context.drawImage(this.drawingCanvas, 
 			sourceRect.x, sourceRect.y, dw, dh, 
 			sourceRect.x, sourceRect.y, dw, dh);
 
 		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+		*/
+		
+		this.copyCanvas(this.drawingCanvas, sourceRect, new Point(sourceRect.x, sourceRect.y));
 	}
 	
 	this.fillRect = function(rect, color) {
@@ -170,7 +205,7 @@ function BitmapData(width, height, transparent, fillColor) {
 		this.context.fillStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";  
 		this.context.fillRect (rect.x, rect.y, rect.width, rect.height);
 		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-	}
+	};
 	
 	this.floodFill = function(x, y, color) {
 		var queue = new Array();
@@ -209,7 +244,7 @@ function BitmapData(width, height, transparent, fillColor) {
 			}
 		}       
 
-	}
+	};
 	
 	this.noise = function(randomSeed, low, high, channelOptions, grayScale) {
 		this.r.seed = randomSeed;
@@ -240,7 +275,7 @@ function BitmapData(width, height, transparent, fillColor) {
 		}	
 		
 		this.context.putImageData(this.imagedata, 0, 0);
-    }
+	};
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);
 	return this;
