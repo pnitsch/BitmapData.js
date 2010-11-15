@@ -238,6 +238,8 @@ function BitmapData(width, height, transparent, fillColor) {
 				this.imagedata.data[pos+3] = 0xff;
 			}
 		}	
+		
+		this.context.putImageData(this.imagedata, 0, 0);
     }
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);
