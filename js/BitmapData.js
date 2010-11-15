@@ -22,13 +22,21 @@ var BlendMode = new function() {
 };
 
 var BitmapDataChannel = new function() {
-	this.ALPHA = 24;
-	this.BLUE = 1;
-	this.GREEN = 8;
-	this.RED = 16;
+	this.ALPHA = 8;
+	this.BLUE = 4;
+	this.GREEN = 2;
+	this.RED = 1;
 };
 
-function BitmapData (width, height, transparent, fillColor) {
+// Park-Miller-Carta Pseudo-Random Number Generator
+function PRNG() {
+	this.seed = 1;
+	this.next = function() { return (this.gen() / 2147483647); };
+	this.nextRange = function(min, max)	{ return min + ((max - min) * this.next()) };
+	this.gen = function() { return this.seed = (this.seed * 16807) % 2147483647; };
+};
+
+function BitmapData(width, height, transparent, fillColor) {
 	this.width = width;
 	this.height = height;
 	this.rect = new Rectangle(0, 0, this.width, this.height);
@@ -45,6 +53,8 @@ function BitmapData (width, height, transparent, fillColor) {
 	this.imagedata = this.context.createImageData(this.width, this.height);
 	this.__defineGetter__("data", function() { return this.imagedata; });  	
 	this.__defineSetter__("data", function(source) { this.imagedata = source; });
+	
+	this.r = new PRNG();
 	
 	this.hexToRGB = function(hex) {
 		var rgb = {
@@ -200,6 +210,35 @@ function BitmapData (width, height, transparent, fillColor) {
 		}       
 
 	}
+	
+	this.noise = function(randomSeed, low, high, channelOptions, grayScale) {
+		this.r.seed = randomSeed;
+		
+		low = low || 0;
+		high = high || 255;
+		channelOptions = channelOptions || 7;
+		grayScale = grayScale || false;
+		
+		for (y = 0; y < this.height; y++) {
+			for (x = 0; x < this.width; x++) {
+				pos = (x + y * this.width) * 4;
+
+				cr = this.r.nextRange(low, high);
+				cg = this.r.nextRange(low, high);
+				cb = this.r.nextRange(low, high);
+				
+				if(grayScale) {
+					gray = (cr + cg + cb) / 3;
+					cr = cg = cb = gray;
+				}
+				
+				this.imagedata.data[pos+0] = (channelOptions & BitmapDataChannel.RED) ? (1 * cr) : 0x00;
+				this.imagedata.data[pos+1] = (channelOptions & BitmapDataChannel.GREEN) ? (1 * cg) : 0x00;
+				this.imagedata.data[pos+2] = (channelOptions & BitmapDataChannel.BLUE) ? (1 * cb) : 0x00;
+				this.imagedata.data[pos+3] = 0xff;
+			}
+		}	
+    }
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);
 	return this;
