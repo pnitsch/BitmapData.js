@@ -100,6 +100,20 @@ function BitmapData(width, height, transparent, fillColor) {
 		return bmd;
 	};
 	
+	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint) {
+		bw = this.canvas.width - sourceRect.width - destPoint.x;
+		bh = this.canvas.height - sourceRect.height - destPoint.y
+
+		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
+		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
+		
+		this.context.drawImage(sourceCanvas, 
+			sourceRect.x, sourceRect.y, dw, dh, 
+			destPoint.x, destPoint.y, dw, dh);
+
+		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+	};
+	
 	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
 		for (y = 0; y < sourceRect.height; y++) {
 			for (x = 0; x < sourceRect.width; x++) {
@@ -119,41 +133,10 @@ function BitmapData(width, height, transparent, fillColor) {
 	};
 	
 	this.copyPixels = function(sourceBitmapData, sourceRect, destPoint, alphaBitmapData, alphaPoint, mergeAlpha) {
-		
-		/*
-		this.drawingCanvas.setAttribute('width', sourceRect.width);
-		this.drawingCanvas.setAttribute('height', sourceRect.height);
-		
-		this.drawingContext.drawImage(sourceBitmapData.canvas, 
-			0, 0, source.width, source.height, 
-			0, 0, source.width, source.height);
-		*/
-		
-		/*
-		for (y = 0; y < sourceRect.height; y++) {
-			for (x = 0; x < sourceRect.width; x++) {
-				this.setPixel(destPoint.x+x, destPoint.y+y, sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y));
-			}
-		}
-		*/
-		
 		this.copyCanvas(sourceBitmapData.canvas, sourceRect, destPoint);
-		
 	};
 	
-	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint) {
-		bw = this.canvas.width - sourceRect.width - destPoint.x;
-		bh = this.canvas.height - sourceRect.height - destPoint.y
-
-		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
-		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
-		
-		this.context.drawImage(sourceCanvas, 
-			sourceRect.x, sourceRect.y, dw, dh, 
-			destPoint.x, destPoint.y, dw, dh);
-
-		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-	};
+	
 		
 	this.draw = function(source, matrix, colorTransform, blendMode, clipRect, smoothing) {
 
@@ -179,21 +162,6 @@ function BitmapData(width, height, transparent, fillColor) {
 		this.drawingContext.drawImage(source, 
 			0, 0, source.width, source.height, 
 			0, 0, source.width, source.height);
-
-/*
-		bw = this.canvas.width - sourceRect.width - sourceRect.x;
-		bh = this.canvas.height - sourceRect.height - sourceRect.y
-
-		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - sourceRect.x) : sourceRect.width;
-		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - sourceRect.y) : sourceRect.height;
-	
-		this.context.putImageData(this.imagedata, 0, 0); // delete
-		this.context.drawImage(this.drawingCanvas, 
-			sourceRect.x, sourceRect.y, dw, dh, 
-			sourceRect.x, sourceRect.y, dw, dh);
-
-		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
-		*/
 		
 		this.copyCanvas(this.drawingCanvas, sourceRect, new Point(sourceRect.x, sourceRect.y));
 	}
