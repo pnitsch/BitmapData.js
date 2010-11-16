@@ -32,6 +32,13 @@ var BitmapDataChannel = new function() {
 function hexToRGB (hex) { return { r: ((hex & 0xff0000) >> 16), g: ((hex & 0x00ff00) >> 8), b: ((hex & 0x0000ff)) }; };
 function RGBToHex(rgb) { return rgb.r<<16 | rgb.g<<8 | rgb.b; };
 
+// 256-value binary Vector struct
+function histogramVector(n) { 
+	var v=[]; 
+	for (var i=0; i<256; i++) { v[i] = n; }
+	return v
+}
+
 // Park-Miller-Carta Pseudo-Random Number Generator
 function PRNG() {
 	this.seed = 1;
@@ -61,8 +68,8 @@ function BitmapData(width, height, transparent, fillColor) {
 	this.r = new PRNG();
 	
 	this.setPixel = function(x, y, color) {
-		rgb = hexToRGB(color);
-		pos = (x + y * this.width) * 4;
+		var rgb = hexToRGB(color);
+		var pos = (x + y * this.width) * 4;
 
 		this.imagedata.data[pos+0] = rgb.r;
 		this.imagedata.data[pos+1] = rgb.g;
@@ -71,8 +78,8 @@ function BitmapData(width, height, transparent, fillColor) {
 	};
 	
 	this.getPixel = function(x, y) {
-		pos = (x + y * this.width) * 4;
-		rgb = {
+		var pos = (x + y * this.width) * 4;
+		var rgb = {
 			r: this.imagedata.data[pos+0],
 			g: this.imagedata.data[pos+1],
 			b: this.imagedata.data[pos+2]
@@ -83,9 +90,10 @@ function BitmapData(width, height, transparent, fillColor) {
 	
 	this.clone = function() {
 		this.context.putImageData(this.imagedata, 0, 0);
-		var bmd = new BitmapData(this.width, this.height, this.transparent);
-		bmd.data = this.context.getImageData(0, 0, this.width, this.height);
-		return bmd;
+		
+		var result = new BitmapData(this.width, this.height, this.transparent);
+		result.data = this.context.getImageData(0, 0, this.width, this.height);
+		return result;
 	};
 	
 	this.compare = function(otherBitmapData) {
@@ -93,10 +101,10 @@ function BitmapData(width, height, transparent, fillColor) {
 		if(this.height != otherBitmapData.height) return -4;
 		if(this.data === otherBitmapData.data) return 0; 
 		
-		
+		var otherRGB, thisRGB, dif;
 		var result = new BitmapData(this.width, this.height);
-		for (y = 0; y < this.height; y++) {
-			for (x = 0; x < this.width; x++) {
+		for (var y = 0; y < this.height; y++) {
+			for (var x = 0; x < this.width; x++) {
 				otherRGB = hexToRGB( otherBitmapData.getPixel(x, y) );
 				thisRGB = hexToRGB( this.getPixel(x, y) );
 				
@@ -116,11 +124,11 @@ function BitmapData(width, height, transparent, fillColor) {
 	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint) {
 		this.context.putImageData(this.imagedata, 0, 0);
 		
-		bw = this.canvas.width - sourceRect.width - destPoint.x;
-		bh = this.canvas.height - sourceRect.height - destPoint.y
+		var bw = this.canvas.width - sourceRect.width - destPoint.x;
+		var bh = this.canvas.height - sourceRect.height - destPoint.y
 
-		dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
-		dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
+		var dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
+		var dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
 		
 		this.context.drawImage(sourceCanvas, 
 			sourceRect.x, sourceRect.y, dw, dh, 
@@ -130,8 +138,10 @@ function BitmapData(width, height, transparent, fillColor) {
 	};
 	
 	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
-		for (y = 0; y < sourceRect.height; y++) {
-			for (x = 0; x < sourceRect.width; x++) {
+		var sourceColor, sourceRGB, rgb;
+		
+		for (var y=0; y<sourceRect.height; y++) {
+			for (var x=0; x<sourceRect.width; x++) {
 				sourceColor = sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y);
 				sourceRGB = hexToRGB(sourceColor);
 				switch(sourceChannel) {
@@ -186,7 +196,7 @@ function BitmapData(width, height, transparent, fillColor) {
 	
 	this.fillRect = function(rect, color) {
 		this.context.putImageData(this.imagedata, 0, 0);
-		rgb = hexToRGB(color);
+		var rgb = hexToRGB(color);
 
 		this.context.fillStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";  
 		this.context.fillRect (rect.x, rect.y, rect.width, rect.height);
@@ -232,6 +242,49 @@ function BitmapData(width, height, transparent, fillColor) {
 
 	};
 	
+	this.histogram = function(hRect) {
+		hRect = hRect || this.rect;
+		
+		var rgb = { r: [], g: [], b: [] };
+		var rv = histogramVector(0);
+		var gv = histogramVector(0);
+		var bv = histogramVector(0);
+		
+		var p = hRect.width*hRect.height;
+		var itr = -1;
+		var pos;
+		var color = [];
+		
+		var bw = this.canvas.width - hRect.width - hRect.x;
+		var bh = this.canvas.height - hRect.height - hRect.y
+		var dw = (bw < 0) ? hRect.width + (this.canvas.width - hRect.width - hRect.x) : hRect.width;
+		var dh = (bh < 0) ? hRect.height + (this.canvas.height - hRect.height - hRect.y) : hRect.height;
+		
+		for(var y=hRect.y; y<dh; y++) {
+			for(var x=hRect.x; x<dw; x++) {
+				pos = (x + y * this.width) * 4;
+				color[itr++] = this.imagedata.data[pos+0];
+				color[itr++] = this.imagedata.data[pos+1];
+				color[itr++] = this.imagedata.data[pos+2];
+			}
+		}
+		
+		itr = 0;
+		for(var i=0; i<p; i+=Math.floor(p/256)) {
+			px = itr*3;
+			rv[itr] = color[px+0];
+			gv[itr] = color[px+1];
+			bv[itr] = color[px+2];
+			itr++;
+		}
+		
+		rgb.r = rv;
+		rgb.g = gv;
+		rgb.b = bv;
+
+		return rgb;
+	};
+		
 	this.noise = function(randomSeed, low, high, channelOptions, grayScale) {
 		this.r.seed = randomSeed;
 		
@@ -240,8 +293,9 @@ function BitmapData(width, height, transparent, fillColor) {
 		channelOptions = channelOptions || 7;
 		grayScale = grayScale || false;
 		
-		for (y = 0; y < this.height; y++) {
-			for (x = 0; x < this.width; x++) {
+		var pos, cr, cg, cb, gray;
+		for (var y=0; y<this.height; y++) {
+			for (var x=0; x<this.width; x++) {
 				pos = (x + y * this.width) * 4;
 
 				cr = this.r.nextRange(low, high);
