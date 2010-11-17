@@ -14,11 +14,11 @@
 				context = canvas.getContext("2d");
 
 				lenna = new Image();
-				lenna.src = "res/Lenna.png";
-				leenaData = new BitmapData(400, 400, 0, 0xff0000);
+				lenna.src = "res/large.png";
+				leenaData = new BitmapData(500, 500, 0, 0x660066);
 				
-				clipping = new Rectangle(10, 10, 380, 380);
-				rotoMatrix = new Matrix(1, 0, 0, 1, 200, 200);
+				clipping = new Rectangle(10, 10, 480, 480);
+				rotoMatrix = new Matrix(1, 0, 0, 1, 250, 250);
 				
 				zoomMax = 0.2;
 				zoomMin = -0.4;
@@ -59,8 +59,8 @@
 		<div id="container">
 			<div id="example-container">
 				<div class="example">
-					<canvas id="canvas" width="400" height="400"></canvas><br>
-					<img id="lenna" src="res/Lenna.png" width="150" height="150" />
+					<canvas id="canvas" width="500" height="500"></canvas>
+					<img id="lenna" src="res/large.png" width="500" height="500" />
 				</div> 
 				<div class="code">
 					<pre>
@@ -109,7 +109,7 @@ setInterval(function() {
 					</pre>
 				</div>
 			</div>
-			<div class="break"><img src="res/break.gif"></div>
+			
 			<div id="links">
 				<ul>
 					<li><a href="index.html">back</a></li>

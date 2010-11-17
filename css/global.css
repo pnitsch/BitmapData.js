@@ -11,6 +11,18 @@ a {
 	text-decoration: none;
 }
 
+#example {
+	width: 100%;
+}
+
+#example #canvas {
+	float:left;
+}
+
+#example img {
+	float:left;
+}
+
 a:hover {
 	color: #000000; 
 	text-decoration: none;
@@ -55,5 +67,5 @@ a:hover {
 	margin-right: 25px;
 	font-size: 1em;
 	line-height: 1.6;
-	float: left;
+
 }

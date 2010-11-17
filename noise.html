@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title>Perlin Noise Example</title> 
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
+		<script type="text/javascript" src="js/Point.js"></script>
+		<script type="text/javascript" src="js/Rectangle.js"></script>
+		<script type="text/javascript" src="js/Matrix.js"></script>
+		<script type="text/javascript" src="js/Simplex.js"></script>
+		<script type="text/javascript" src="js/BitmapData.js"></script>
+		
+		<script> 
+			function init(){
+				canvas = document.getElementById("canvas");
+				context = canvas.getContext("2d");
+
+				var bmd = new BitmapData(400, 400);
+				bmd.perlinNoise(
+					bmd.width/2, 										// baseX
+					bmd.height/2, 										// baseY
+					parseInt(Math.random()*0xffff), 					// seed
+					BitmapDataChannel.RED | BitmapDataChannel.BLUE, 	// channel options
+					false // gray-scale
+				);
+
+				context.putImageData(bmd.data, 0, 0);	
+			};	
+		</script>
+	</head> 
+	<body onload="init();"> 
+		<div id="container">
+			<div id="example-container">
+				<div class="example">
+					<canvas id="canvas" width="400" height="400"></canvas>
+
+				</div> 
+				<div class="code">
+					<pre>
+canvas = document.getElementById("canvas");
+context = canvas.getContext("2d");
+
+var bmd = new BitmapData(400, 400);
+bmd.perlinNoise(
+	bmd.width/2,	// baseX
+	bmd.height/2,	// baseY
+	parseInt(Math.random()*0xffff),	// seed
+	BitmapDataChannel.RED | BitmapDataChannel.BLUE,	// channel options
+	false // gray-scale
+);
+
+context.putImageData(bmd.data, 0, 0);
+					</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="index.html">back</a></li>
+				</ul>
+			</div>
+		</div>
+	</body> 
+</html>

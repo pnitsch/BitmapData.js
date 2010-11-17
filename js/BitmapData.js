@@ -65,7 +65,7 @@ function BitmapData(width, height, transparent, fillColor) {
 	this.__defineGetter__("data", function() { return this.imagedata; });  	
 	this.__defineSetter__("data", function(source) { this.imagedata = source; });
 	
-	this.r = new PRNG();
+	this.rand;
 	
 	this.setPixel = function(x, y, color) {
 		var rgb = hexToRGB(color);
@@ -284,9 +284,10 @@ function BitmapData(width, height, transparent, fillColor) {
 
 		return rgb;
 	};
-		
+				
 	this.noise = function(randomSeed, low, high, channelOptions, grayScale) {
-		this.r.seed = randomSeed;
+		this.rand = this.rand || new PRNG();
+		this.rand.seed = randomSeed;
 		
 		low = low || 0;
 		high = high || 255;
@@ -298,9 +299,9 @@ function BitmapData(width, height, transparent, fillColor) {
 			for (var x=0; x<this.width; x++) {
 				pos = (x + y * this.width) * 4;
 
-				cr = this.r.nextRange(low, high);
-				cg = this.r.nextRange(low, high);
-				cb = this.r.nextRange(low, high);
+				cr = this.rand.nextRange(low, high);
+				cg = this.rand.nextRange(low, high);
+				cb = this.rand.nextRange(low, high);
 				
 				if(grayScale) {
 					gray = (cr + cg + cb) / 3;
@@ -313,6 +314,55 @@ function BitmapData(width, height, transparent, fillColor) {
 				this.imagedata.data[pos+3] = 0xff;
 			}
 		}	
+	};
+	
+	
+	this.simplexR;
+	
+	this.perlinNoise = function(baseX, baseY, randomSeed, channelOptions, grayScale) {
+		this.rand = this.rand || new PRNG();
+		this.rand.seed = randomSeed;
+		
+		channelOptions = channelOptions || 7;
+		grayScale = grayScale || false;
+		
+		var numChannels = 0;
+		if(channelOptions & BitmapDataChannel.RED){
+			this.simplexR = this.simplexR || new SimplexNoise(this.rand);
+			this.simplexR.setSeed(randomSeed);
+			numChannels++;
+		} 
+		if(channelOptions & BitmapDataChannel.GREEN) {
+			this.simplexG = this.simplexG || new SimplexNoise(this.rand);
+			this.simplexG.setSeed(randomSeed+1);
+			numChannels++;
+		}
+		if(channelOptions & BitmapDataChannel.BLUE) {
+			this.simplexB = this.simplexB || new SimplexNoise(this.rand);
+			this.simplexB.setSeed(randomSeed+2);
+			numChannels++;
+		}
+		
+		var pos, cr, cg, cb;
+		for(var y=0; y<this.height; y++) {
+			for(var x=0; x<this.width; x++) {
+				pos = (x + y * this.width) * 4;
+				
+				cr = (channelOptions & BitmapDataChannel.RED) ? parseInt(((this.simplexR.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cg = (channelOptions & BitmapDataChannel.GREEN) ? parseInt(((this.simplexG.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cb = (channelOptions & BitmapDataChannel.BLUE) ? parseInt(((this.simplexB.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+
+				if(grayScale) {
+					gray = (cr + cg + cb) / numChannels;
+					cr = cg = cb = gray;
+				}
+				
+				this.imagedata.data[pos+0] = cr;
+				this.imagedata.data[pos+1] = cg;
+				this.imagedata.data[pos+2] = cb;
+				this.imagedata.data[pos+3] = 0xff;
+			}
+		}
 	};
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);
