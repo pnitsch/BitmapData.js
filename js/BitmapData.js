@@ -3,6 +3,8 @@
  * HTML5 Canvas API implementation of the AS3 BitmapData class. 
  */
 
+const halfColorMax = 0.00784313725;
+
 var BlendMode = new function() {
 	this.ADD = "add";
 	this.ALPHA = "alpha";
@@ -65,8 +67,6 @@ function BitmapData(width, height, transparent, fillColor) {
 	this.__defineGetter__("data", function() { return this.imagedata; });  	
 	this.__defineSetter__("data", function(source) { this.imagedata = source; });
 	
-	this.rand;
-	
 	this.setPixel = function(x, y, color) {
 		var rgb = hexToRGB(color);
 		var pos = (x + y * this.width) * 4;
@@ -96,6 +96,11 @@ function BitmapData(width, height, transparent, fillColor) {
 		return result;
 	};
 	
+	this.applyFilter = function(sourceBitmapData, sourceRect, destPoint, filter) {
+		var copy = this.clone();
+		filter.run(sourceRect, this.imagedata.data, copy.imagedata.data);
+	};
+	
 	this.compare = function(otherBitmapData) {
 		if(this.width != otherBitmapData.width) return -3;
 		if(this.height != otherBitmapData.height) return -4;
@@ -121,7 +126,7 @@ function BitmapData(width, height, transparent, fillColor) {
 		return result;
 	};
 	
-	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint) {
+	this.copyCanvas = function(sourceCanvas, sourceRect, destPoint, blendMode) {
 		this.context.putImageData(this.imagedata, 0, 0);
 		
 		var bw = this.canvas.width - sourceRect.width - destPoint.x;
@@ -130,11 +135,110 @@ function BitmapData(width, height, transparent, fillColor) {
 		var dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
 		var dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
 		
-		this.context.drawImage(sourceCanvas, 
-			sourceRect.x, sourceRect.y, dw, dh, 
-			destPoint.x, destPoint.y, dw, dh);
+		if(blendMode) {
 
-		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+			var sourceData = sourceCanvas.getContext("2d").getImageData(sourceRect.x, sourceRect.y, dw, dh);
+			var sourcePos, destPos;
+			
+			for (var y=0; y<dh; y++) {
+				for (var x=0; x<dw; x++) {
+					sourcePos = (x + y * dw) * 4;
+					destPos = ((x+destPoint.x) + (y+destPoint.y) * this.width) * 4;
+					
+					switch(blendMode) {
+						case BlendMode.ADD:
+							this.imagedata.data[destPos] = Math.min(this.imagedata.data[destPos] + sourceData.data[sourcePos], 255);
+							this.imagedata.data[destPos+1] = Math.min(this.imagedata.data[destPos+1] + sourceData.data[sourcePos+1], 255);
+							this.imagedata.data[destPos+2] = Math.min(this.imagedata.data[destPos+2] + sourceData.data[sourcePos+2], 255);
+						break;
+						
+						case BlendMode.SUBTRACT:
+							this.imagedata.data[destPos] = Math.max(sourceData.data[sourcePos] - this.imagedata.data[destPos], 0);
+							this.imagedata.data[destPos+1] = Math.max(sourceData.data[sourcePos+1] - this.imagedata.data[destPos+1], 0);
+							this.imagedata.data[destPos+2] = Math.max(sourceData.data[sourcePos+2] - this.imagedata.data[destPos+2], 0);
+						break;
+						
+						case BlendMode.INVERT:
+							this.imagedata.data[destPos] = 255 - sourceData.data[sourcePos];
+							this.imagedata.data[destPos+1] = 255 - sourceData.data[sourcePos+1];
+							this.imagedata.data[destPos+2] = 255 - sourceData.data[sourcePos+1];
+						break;
+						
+						case BlendMode.MULTIPLY:
+							this.imagedata.data[destPos] = sourceData.data[sourcePos] * this.imagedata.data[destPos] / 255;
+							this.imagedata.data[destPos+1] = sourceData.data[sourcePos+1] * this.imagedata.data[destPos+1] / 255;
+							this.imagedata.data[destPos+2] = sourceData.data[sourcePos+2] * this.imagedata.data[destPos+2] / 255;
+						break;
+						
+						case BlendMode.LIGHTEN:
+							if(sourceData.data[sourcePos] > this.imagedata.data[destPos]) this.imagedata.data[destPos] = sourceData.data[sourcePos];
+							if(sourceData.data[sourcePos+1] > this.imagedata.data[destPos+1]) this.imagedata.data[destPos+1] = sourceData.data[sourcePos+1];
+							if(sourceData.data[sourcePos+2] > this.imagedata.data[destPos+2]) this.imagedata.data[destPos+2] = sourceData.data[sourcePos+2];
+						break;
+						
+						case BlendMode.DARKEN:
+							if(sourceData.data[sourcePos] < this.imagedata.data[destPos]) this.imagedata.data[destPos] = sourceData.data[sourcePos];
+							if(sourceData.data[sourcePos+1] < this.imagedata.data[destPos+1]) this.imagedata.data[destPos+1] = sourceData.data[sourcePos+1];
+							if(sourceData.data[sourcePos+2] < this.imagedata.data[destPos+2]) this.imagedata.data[destPos+2] = sourceData.data[sourcePos+2];
+						break;
+
+						case BlendMode.DIFFERENCE:
+							this.imagedata.data[destPos] = Math.abs(sourceData.data[sourcePos] - this.imagedata.data[destPos]);
+							this.imagedata.data[destPos+1] = Math.abs(sourceData.data[sourcePos+1] - this.imagedata.data[destPos+1]);
+							this.imagedata.data[destPos+2] = Math.abs(sourceData.data[sourcePos+2] - this.imagedata.data[destPos+2]);
+						break;
+						
+						case BlendMode.SCREEN:
+							this.imagedata.data[destPos] = (255 - ( ((255-this.imagedata.data[destPos])*(255-sourceData.data[sourcePos])) >> 8));
+							this.imagedata.data[destPos+1] = (255 - ( ((255-this.imagedata.data[destPos+1])*(255-sourceData.data[sourcePos+1])) >> 8));
+							this.imagedata.data[destPos+2] = (255 - ( ((255-this.imagedata.data[destPos+2])*(255-sourceData.data[sourcePos+2])) >> 8));
+						break;
+
+						case BlendMode.OVERLAY:
+							if(sourceData.data[sourcePos] < 128) this.imagedata.data[destPos] = this.imagedata.data[destPos] * sourceData.data[sourcePos] * halfColorMax;
+							else this.imagedata.data[destPos] = 255 - (255-this.imagedata.data[destPos])*(255-sourceData.data[sourcePos])*halfColorMax;
+							
+							if(sourceData.data[sourcePos+1] < 128) this.imagedata.data[destPos+1] = this.imagedata.data[destPos+1] * sourceData.data[sourcePos+1] * halfColorMax;
+							else this.imagedata.data[destPos+1] = 255 - (255-this.imagedata.data[destPos+1])*(255-sourceData.data[sourcePos+1])*halfColorMax;
+							
+							if(sourceData.data[sourcePos+2] < 128) this.imagedata.data[destPos+2] = this.imagedata.data[destPos+2] * sourceData.data[sourcePos+2] * halfColorMax;
+							else this.imagedata.data[destPos+2] = 255 - (255-this.imagedata.data[destPos+2])*(255-sourceData.data[sourcePos+2])*halfColorMax;
+						break;
+
+						case BlendMode.OVERLAY:
+							if(sourceData.data[sourcePos] < 128) this.imagedata.data[destPos] = this.imagedata.data[destPos] * sourceData.data[sourcePos] * halfColorMax;
+							else this.imagedata.data[destPos] = 255 - (255-this.imagedata.data[destPos])*(255-sourceData.data[sourcePos])*halfColorMax;
+							
+							if(sourceData.data[sourcePos+1] < 128) this.imagedata.data[destPos+1] = this.imagedata.data[destPos+1] * sourceData.data[sourcePos+1] * halfColorMax;
+							else this.imagedata.data[destPos+1] = 255 - (255-this.imagedata.data[destPos+1])*(255-sourceData.data[sourcePos+1])*halfColorMax;
+							
+							if(sourceData.data[sourcePos+2] < 128) this.imagedata.data[destPos+2] = this.imagedata.data[destPos+2] * sourceData.data[sourcePos+2] * halfColorMax;
+							else this.imagedata.data[destPos+2] = 255 - (255-this.imagedata.data[destPos+2])*(255-sourceData.data[sourcePos+2])*halfColorMax;
+						break;
+						
+						case BlendMode.HARDLIGHT:
+							if(this.imagedata.data[destPos] < 128) this.imagedata.data[destPos] = this.imagedata.data[destPos] * sourceData.data[sourcePos] * halfColorMax;
+							else this.imagedata.data[destPos] = 255 - (255-this.imagedata.data[destPos])*(255-sourceData.data[sourcePos])*halfColorMax;
+							
+							if(this.imagedata.data[destPos+1] < 128) this.imagedata.data[destPos+1] = this.imagedata.data[destPos+1] * sourceData.data[sourcePos+1] * halfColorMax;
+							else this.imagedata.data[destPos+1] = 255 - (255-this.imagedata.data[destPos+1])*(255-sourceData.data[sourcePos+1])*halfColorMax;
+							
+							if(this.imagedata.data[destPos+2] < 128) this.imagedata.data[destPos+2] = this.imagedata.data[destPos+2] * sourceData.data[sourcePos+2] * halfColorMax;
+							else this.imagedata.data[destPos+2] = 255 - (255-this.imagedata.data[destPos+2])*(255-sourceData.data[sourcePos+2])*halfColorMax;
+						break;	
+						
+					}
+				}
+			}
+			
+		} else {
+			this.context.drawImage(sourceCanvas, 
+				sourceRect.x, sourceRect.y, dw, dh, 
+				destPoint.x, destPoint.y, dw, dh);
+			
+			this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+		}
+		
 	};
 	
 	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
@@ -191,7 +295,7 @@ function BitmapData(width, height, transparent, fillColor) {
 			0, 0, source.width, source.height, 
 			0, 0, source.width, source.height);
 		
-		this.copyCanvas(this.drawingCanvas, sourceRect, new Point(sourceRect.x, sourceRect.y));
+		this.copyCanvas(this.drawingCanvas, sourceRect, new Point(sourceRect.x, sourceRect.y), blendMode);
 	}
 	
 	this.fillRect = function(rect, color) {
@@ -315,9 +419,6 @@ function BitmapData(width, height, transparent, fillColor) {
 			}
 		}	
 	};
-	
-	
-	this.simplexR;
 	
 	this.perlinNoise = function(baseX, baseY, randomSeed, channelOptions, grayScale) {
 		this.rand = this.rand || new PRNG();
