@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title>Blendmodes Example</title> 
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
+		<script type="text/javascript" src="js/Point.js"></script>
+		<script type="text/javascript" src="js/Rectangle.js"></script>
+		<script type="text/javascript" src="js/Matrix.js"></script>
+		<script type="text/javascript" src="js/BitmapData.js"></script>
+		<script> 
+			function init(){
+				canvas = document.getElementById("canvas");
+				context = canvas.getContext("2d");
+				log = document.getElementById("log");
+				
+				blendModeArray = [
+					{mode: BlendMode.ADD, name: "BlendMode.ADD"},
+					{mode: BlendMode.DARKEN, name: "BlendMode.DARKEN"},
+					{mode: BlendMode.DIFFERENCE, name: "BlendMode.DIFFERENCE"},
+					{mode: BlendMode.HARDLIGHT, name: "BlendMode.HARDLIGHT"},
+					{mode: BlendMode.LIGHTEN, name: "BlendMode.LIGHTEN"},
+					{mode: BlendMode.MULTIPLY, name: "BlendMode.MULTIPLY"},
+					{mode: BlendMode.NORMAL, name: "BlendMode.NORMAL"},
+					{mode: BlendMode.OVERLAY, name: "BlendMode.OVERLAY"},
+					{mode: BlendMode.SCREEN, name: "BlendMode.SCREEN"},
+					{mode: BlendMode.SUBTRACT, name: "BlendMode.SUBTRACT"}
+				];
+
+				bikes = new Image();
+				bikes.src = "res/bikes.png";
+				
+				lenna = new Image();
+				lenna.src = "res/Lenna.png";
+				
+				bmd = new BitmapData(300, 300);
+				bmd.draw(bikes);
+
+				counter = 0;
+				function cycle() {
+					bmd.draw(bikes);
+					bmd.draw(lenna, new Matrix(1, 0, 0, 1, -50, -50), null, blendModeArray[counter].mode);
+					context.putImageData(bmd.data, 0, 0);
+					
+					log.innerHTML = blendModeArray[counter].name;
+					
+					if(counter==blendModeArray.length-1) {
+						counter = 0;
+					} else {
+						counter++;
+					}
+				}
+				
+				cycle();
+				setInterval(cycle, 2000);
+				
+			};	
+		</script>
+	</head> 
+	<body onload="init();"> 
+		<div id="container">
+			<div id="example-container">
+				<div class="example">
+					
+					
+					<canvas id="canvas" width="300" height="300"></canvas><br>
+					<p><strong>Mode: <span id="log">Title</span></strong></p>
+					<img id="bikes" src="res/bikes.png" width="150" height="150" />
+					<img id="lenna" src="res/Lenna.png" width="150" height="150" /><br>
+					
+					
+				</div> 
+				<div class="code">
+					<pre>
+canvas = document.getElementById("canvas");
+context = canvas.getContext("2d");
+log = document.getElementById("log");
+
+blendModeArray = [
+	{mode: BlendMode.ADD, name: "BlendMode.ADD"},
+	{mode: BlendMode.DARKEN, name: "BlendMode.DARKEN"},
+	{mode: BlendMode.DIFFERENCE, name: "BlendMode.DIFFERENCE"},
+	{mode: BlendMode.HARDLIGHT, name: "BlendMode.HARDLIGHT"},
+	{mode: BlendMode.LIGHTEN, name: "BlendMode.LIGHTEN"},
+	{mode: BlendMode.MULTIPLY, name: "BlendMode.MULTIPLY"},
+	{mode: BlendMode.NORMAL, name: "BlendMode.NORMAL"},
+	{mode: BlendMode.OVERLAY, name: "BlendMode.OVERLAY"},
+	{mode: BlendMode.SCREEN, name: "BlendMode.SCREEN"},
+	{mode: BlendMode.SUBTRACT, name: "BlendMode.SUBTRACT"}
+];
+
+bikes = new Image();
+bikes.src = "res/bikes.png";
+
+lenna = new Image();
+lenna.src = "res/Lenna.png";
+
+bmd = new BitmapData(300, 300);
+bmd.draw(bikes);
+
+counter = 0;
+function cycle() {
+	bmd.draw(bikes);
+	bmd.draw(lenna, new Matrix(1, 0, 0, 1, -50, -50), null, blendModeArray[counter].mode);
+	context.putImageData(bmd.data, 0, 0);
+
+	log.innerHTML = blendModeArray[counter].name;
+
+	if(counter==blendModeArray.length-1) {
+		counter = 0;
+	} else {
+		counter++;
+	}
+}
+
+cycle();
+setInterval(cycle, 2000);
+					</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="index.html">back</a></li>
+				</ul>
+			</div>
+		</div>
+	</body> 
+</html>

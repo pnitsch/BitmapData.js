@@ -135,7 +135,7 @@ function BitmapData(width, height, transparent, fillColor) {
 		var dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
 		var dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
 		
-		if(blendMode) {
+		if(blendMode && blendMode != BlendMode.NORMAL) {
 
 			var sourceData = sourceCanvas.getContext("2d").getImageData(sourceRect.x, sourceRect.y, dw, dh);
 			var sourcePos, destPos;
@@ -470,3 +470,10 @@ function BitmapData(width, height, transparent, fillColor) {
 	return this;
 };
 
+Image.prototype.__defineGetter__("bitmapData", function() { 
+	if(!this._bitmapData) {
+		this._bitmapData = new BitmapData(this.width, this.height);
+		this._bitmapData.draw(this);
+	}
+	return this._bitmapData; 
+});  	
