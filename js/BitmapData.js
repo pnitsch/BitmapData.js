@@ -54,6 +54,7 @@ function BitmapData(width, height, transparent, fillColor) {
 	this.height = height;
 	this.rect = new Rectangle(0, 0, this.width, this.height);
 	this.transparent = transparent || false;
+	this.gpu = false;
 	
 	this.drawingCanvas = document.createElement("canvas");
 	this.drawingContext = this.drawingCanvas.getContext("2d");
@@ -246,22 +247,25 @@ function BitmapData(width, height, transparent, fillColor) {
 	
 	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
 		var sourceColor, sourceRGB, rgb;
+		var redChannel = BitmapDataChannel.RED;
+		var greenChannel = BitmapDataChannel.GREEN;
+		var blueChannel = BitmapDataChannel.BLUE;
 		
 		for (var y=0; y<sourceRect.height; y++) {
 			for (var x=0; x<sourceRect.width; x++) {
 				sourceColor = sourceBitmapData.getPixel(sourceRect.x+x, sourceRect.y+y);
 				sourceRGB = hexToRGB(sourceColor);
 				switch(sourceChannel) {
-					case BitmapDataChannel.RED: channelValue = sourceRGB.r; break;
-					case BitmapDataChannel.GREEN: channelValue = sourceRGB.g; break;
-					case BitmapDataChannel.BLUE: channelValue = sourceRGB.b; break;
+					case redChannel: channelValue = sourceRGB.r; break;
+					case greenChannel: channelValue = sourceRGB.g; break;
+					case blueChannel: channelValue = sourceRGB.b; break;
 				}
 				
 				rgb = hexToRGB( this.getPixel(destPoint.x+x, destPoint.y+y) ); // redundancy
 				switch(destChannel){
-					case BitmapDataChannel.RED: rgb.r = channelValue; break;
-					case BitmapDataChannel.GREEN: rgb.g = channelValue; break;
-					case BitmapDataChannel.BLUE: rgb.b = channelValue; break;
+					case redChannel: rgb.r = channelValue; break;
+					case greenChannel: rgb.g = channelValue; break;
+					case blueChannel: rgb.b = channelValue; break;
 				}
 				
 				this.setPixel(destPoint.x+x, destPoint.y+y, RGBToHex(rgb));
@@ -398,6 +402,10 @@ function BitmapData(width, height, transparent, fillColor) {
 		this.rand = this.rand || new PRNG();
 		this.rand.seed = randomSeed;
 		
+		var redChannel = BitmapDataChannel.RED;
+		var greenChannel = BitmapDataChannel.GREEN;
+		var blueChannel = BitmapDataChannel.BLUE;
+		
 		var data = this.imagedata.data;
 		
 		low = low || 0;
@@ -419,9 +427,9 @@ function BitmapData(width, height, transparent, fillColor) {
 					cr = cg = cb = gray;
 				}
 				
-				data[pos+0] = (channelOptions & BitmapDataChannel.RED) ? (1 * cr) : 0x00;
-				data[pos+1] = (channelOptions & BitmapDataChannel.GREEN) ? (1 * cg) : 0x00;
-				data[pos+2] = (channelOptions & BitmapDataChannel.BLUE) ? (1 * cb) : 0x00;
+				data[pos+0] = (channelOptions & redChannel) ? (1 * cr) : 0x00;
+				data[pos+1] = (channelOptions & greenChannel) ? (1 * cg) : 0x00;
+				data[pos+2] = (channelOptions & blueChannel) ? (1 * cb) : 0x00;
 				data[pos+3] = 0xff;
 			}
 		}	
@@ -431,23 +439,27 @@ function BitmapData(width, height, transparent, fillColor) {
 		this.rand = this.rand || new PRNG();
 		this.rand.seed = randomSeed;
 		
+		var redChannel = BitmapDataChannel.RED;
+		var greenChannel = BitmapDataChannel.GREEN;
+		var blueChannel = BitmapDataChannel.BLUE;
+		
 		channelOptions = channelOptions || 7;
 		grayScale = grayScale || false;
 		
 		var data = this.imagedata.data;
 		
 		var numChannels = 0;
-		if(channelOptions & BitmapDataChannel.RED){
+		if(channelOptions & redChannel){
 			this.simplexR = this.simplexR || new SimplexNoise(this.rand);
 			this.simplexR.setSeed(randomSeed);
 			numChannels++;
 		} 
-		if(channelOptions & BitmapDataChannel.GREEN) {
+		if(channelOptions & greenChannel) {
 			this.simplexG = this.simplexG || new SimplexNoise(this.rand);
 			this.simplexG.setSeed(randomSeed+1);
 			numChannels++;
 		}
-		if(channelOptions & BitmapDataChannel.BLUE) {
+		if(channelOptions & blueChannel) {
 			this.simplexB = this.simplexB || new SimplexNoise(this.rand);
 			this.simplexB.setSeed(randomSeed+2);
 			numChannels++;
@@ -458,9 +470,9 @@ function BitmapData(width, height, transparent, fillColor) {
 			for(var x=0; x<this.width; x++) {
 				pos = (x + y * this.width) * 4;
 				
-				cr = (channelOptions & BitmapDataChannel.RED) ? parseInt(((this.simplexR.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
-				cg = (channelOptions & BitmapDataChannel.GREEN) ? parseInt(((this.simplexG.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
-				cb = (channelOptions & BitmapDataChannel.BLUE) ? parseInt(((this.simplexB.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cr = (channelOptions & redChannel) ? parseInt(((this.simplexR.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cg = (channelOptions & greenChannel) ? parseInt(((this.simplexG.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cb = (channelOptions & blueChannel) ? parseInt(((this.simplexB.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
 
 				if(grayScale) {
 					gray = (cr + cg + cb) / numChannels;
