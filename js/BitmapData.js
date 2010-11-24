@@ -630,7 +630,7 @@ function BitmapData(width, height, transparent, fillColor) {
 		mask = mask || 0xffffff;
 		copySource = copySource || false;
 		
-		this.context.putImageData(this.imagedata, 0, 0);
+		//this.context.putImageData(this.imagedata, 0, 0);
 		
 		var bw = this.canvas.width - sourceRect.width - destPoint.x;
 		var bh = this.canvas.height - sourceRect.height - destPoint.y
@@ -644,44 +644,43 @@ function BitmapData(width, height, transparent, fillColor) {
 		
 		for (var y=0; y<dh; y++) {
 			for (var x=0; x<dw; x++) {
-				sourcePos = (x + y * dw) * 4;
-				destPos = ((x+destPoint.x) + (y+destPoint.y) * this.width) * 4;
+				sourcePos = ((x+sourceRect.x) + (y+sourceRect.y) * sourceBitmapData.width) * 4;
 				sourceHex = RGBToHex({r:sourceData[sourcePos], g:sourceData[sourcePos+1], b:sourceData[sourcePos+2]});
 				
 				switch(operation) {
 					case "<": 
 						if((sourceHex & mask) < (threshold & mask)) {
-							if(copySource) this.setPixel(x, y, sourceHex); else this.setPixel(x, y, color); 
+							if(copySource) this.setPixel(x+destPoint.x, y+destPoint.y, sourceHex); else this.setPixel(x+destPoint.x, y+destPoint.y, color); 
 						}
 					break;
 					
 					case "<=": 
 						if((sourceHex & mask) <= (threshold & mask)) {
-							if(copySource) this.setPixel(x, y, sourceHex); else this.setPixel(x, y, color); 
+							if(copySource) this.setPixel(x+destPoint.x, y+destPoint.y, sourceHex); else this.setPixel(x+destPoint.x, y+destPoint.y, color); 
 						}
 					break;
 					
 					case ">": 
 						if((sourceHex & mask) > (threshold & mask)) {
-							if(copySource) this.setPixel(x, y, sourceHex); else this.setPixel(x, y, color); 
+							if(copySource) this.setPixel(x+destPoint.x, y+destPoint.y, sourceHex); else this.setPixel(x+destPoint.x, y+destPoint.y, color); 
 						}
 					break;
 					
 					case ">=": 
 						if((sourceHex & mask) <= (threshold & mask)) {
-							if(copySource) this.setPixel(x, y, sourceHex); else this.setPixel(x, y, color); 
+							if(copySource) this.setPixel(x+destPoint.x, y+destPoint.y, sourceHex); else this.setPixel(x+destPoint.x, y+destPoint.y, color); 
 						}
 					break;
 					
 					case "==": 
 						if((sourceHex & mask) == (threshold & mask)) {
-							if(copySource) this.setPixel(x, y, sourceHex); else this.setPixel(x, y, color); 
+							if(copySource) this.setPixel(x+destPoint.x, y+destPoint.y, sourceHex); else this.setPixel(x+destPoint.x, y+destPoint.y, color); 
 						}
 					break;
 					
 					case "!=": 
 						if((sourceHex & mask) != (threshold & mask)) {
-							if(copySource) this.setPixel(x, y, sourceHex); else this.setPixel(x, y, color); 
+							if(copySource) this.setPixel(x+destPoint.x, y+destPoint.y, sourceHex); else this.setPixel(x+destPoint.x, y+destPoint.y, color);  
 						}
 					break;
 				}
