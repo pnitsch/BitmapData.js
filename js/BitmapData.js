@@ -15,7 +15,8 @@ var BlendMode = new function() {
 	this.INVERT = "invert";
 	this.LAYER = "layer";
 	this.LIGHTEN = "lighten";
-	this.HARDLIGHT = "multiply";
+	this.HARDLIGHT = "hardlight";
+	this.MULTIPLY = "multiply";
 	this.NORMAL = "normal";
 	this.OVERLAY = "overlay";
 	this.SCREEN = "screen";
@@ -54,19 +55,155 @@ function BitmapData(width, height, transparent, fillColor) {
 	this.height = height;
 	this.rect = new Rectangle(0, 0, this.width, this.height);
 	this.transparent = transparent || false;
-	this.gpu = false;
-	
-	this.drawingCanvas = document.createElement("canvas");
-	this.drawingContext = this.drawingCanvas.getContext("2d");
-	
+
 	this.canvas = document.createElement("canvas");
 	this.context = this.canvas.getContext("2d");
 	this.canvas.setAttribute('width', this.width);
 	this.canvas.setAttribute('height', this.height);
 	
+	this.drawingCanvas = document.createElement("canvas");
+	this.drawingContext = this.drawingCanvas.getContext("2d");
+
 	this.imagedata = this.context.createImageData(this.width, this.height);
 	this.__defineGetter__("data", function() { return this.imagedata; });  	
 	this.__defineSetter__("data", function(source) { this.imagedata = source; });
+	
+	
+	/*** WebGL functions ***/
+	
+	this.glCanvas = document.createElement("canvas");
+	this.gl = null;
+	this.program = null;
+	this.gpuEnabled = true;
+	try { this.gl = this.glCanvas.getContext("experimental-webgl"); } 
+	catch (e) { this.gpuEnabled = false; }
+	
+	this.va = null;
+	this.tex0 = null;
+	this.tex1 = null;
+	this.glPixelArray = null;
+	
+	this.initProgram = function(effect) {
+		var gl = this.gl;
+		var program = gl.createProgram();
+
+		var vs = gl.createShader(gl.VERTEX_SHADER);
+		var fs = gl.createShader(gl.FRAGMENT_SHADER);
+
+		gl.shaderSource(vs, effect.vsSrc);
+		gl.shaderSource(fs, effect.fsSrc);
+		gl.compileShader(vs);
+		gl.compileShader(fs);
+		
+		if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) { gl.deleteProgram( program ); }
+		if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) { gl.deleteProgram( program ); }
+
+		gl.attachShader(program, vs);
+		gl.attachShader(program, fs);
+		gl.deleteShader(vs);
+		gl.deleteShader(fs);
+
+		gl.linkProgram(program);
+		if( this.program != null ) gl.deleteProgram( this.program );
+		this.program = program;
+		
+		gl.viewport( 0, 0, this.canvas.width, this.canvas.height );
+		gl.useProgram(program);
+		
+		var vertices = new Float32Array(
+			[-1.0, -1.0, 
+			1.0, -1.0, 
+			-1.0,  1.0, 
+			1.0, -1.0, 
+			1.0,  1.0, 
+			-1.0, 1.0]);
+			
+	    this.va = gl.createBuffer();
+	    gl.bindBuffer(gl.ARRAY_BUFFER, this.va);
+	    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+	};
+	
+	this.initTexture = function(pos, image) {
+		var gl = this.gl;
+		var tex = gl.createTexture();
+
+		gl.enable(gl.TEXTURE_2D);
+		gl.bindTexture(gl.TEXTURE_2D, tex);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		gl.generateMipmap(gl.TEXTURE_2D)
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		
+		if( pos == 0 ) {
+			if(this.tex0 != null) gl.deleteTexture(this.tex0); 
+			this.tex0 = tex;
+			
+			this.glCanvas.setAttribute('width', image.width);
+			this.glCanvas.setAttribute('height', image.height);
+			this.glPixelArray = new Uint8Array(image.width * image.height * 4);
+		} else {
+			if(this.tex1 != null) gl.deleteTexture(this.tex1); 
+			this.tex1 = tex;
+		}
+	};
+	
+	this.drawGL = function(matrix) {
+		var gl = this.gl;
+		var program = this.program;
+		var ra = [matrix.a, matrix.c, 0, matrix.b, matrix.d, 0, 0, 0, 1];
+		
+		var p = gl.getAttribLocation(program, "pos");
+		var ur = gl.getUniformLocation(program, "r");
+		var ut = gl.getUniformLocation(program, "t");
+		var t0 = gl.getUniformLocation(program, "tex0");
+		var t1 = gl.getUniformLocation(program, "tex1");
+		var rm = gl.getUniformLocation(program, "rMat");
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.va);
+
+		gl.uniform2f(ur, this.glCanvas.width*2, this.glCanvas.height*2);
+		gl.uniformMatrix3fv(rm, false, new Float32Array(ra));
+		gl.uniform2f(ut, matrix.tx, matrix.ty);
+
+		gl.vertexAttribPointer(p, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(p);
+
+		gl.uniform1i(t0, 0 ); 
+		gl.activeTexture(gl.TEXTURE0); 
+		gl.bindTexture(gl.TEXTURE_2D, this.tex0); 
+		
+		gl.uniform1i(t1, 1 ); 
+		gl.activeTexture(gl.TEXTURE1); 
+		gl.bindTexture(gl.TEXTURE_2D, this.tex1);
+
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+		gl.disableVertexAttribArray(p);
+
+		gl.flush();
+		
+		var w = this.glCanvas.width;
+		var h = this.glCanvas.height;
+		var arr = this.glPixelArray;
+		gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, arr);
+		
+		var pos;
+		var data = this.imagedata.data;
+		for (var y=0; y<h; y++) {
+			for (var x=0; x<w; x++) {
+				pos = (x + y * w) * 4; 
+				data[pos] = arr[pos];
+				data[pos+1] = arr[pos+1];
+				data[pos+2] = arr[pos+2];
+			}
+		}
+	};
+	
+	
+	
+	/*** Canvas2D function ***/
 	
 	this.setPixel = function(x, y, color) {
 		var rgb = hexToRGB(color);
@@ -76,7 +213,6 @@ function BitmapData(width, height, transparent, fillColor) {
 		data[pos+0] = rgb.r;
 		data[pos+1] = rgb.g;
 		data[pos+2] = rgb.b;
-		data[pos+3] = 0xff;	
 	};
 	
 	this.getPixel = function(x, y) {
@@ -169,9 +305,9 @@ function BitmapData(width, height, transparent, fillColor) {
 						break;
 						
 						case BlendMode.MULTIPLY:
-							data[destPos] = sourceData.data[sourcePos] * data[destPos] / 255;
-							data[destPos+1] = sourceData.data[sourcePos+1] * data[destPos+1] / 255;
-							data[destPos+2] = sourceData.data[sourcePos+2] * data[destPos+2] / 255;
+							data[destPos] = Math.floor(sourceData.data[sourcePos] * data[destPos] / 255);
+							data[destPos+1] = Math.floor(sourceData.data[sourcePos+1] * data[destPos+1] / 255);
+							data[destPos+2] = Math.floor(sourceData.data[sourcePos+2] * data[destPos+2] / 255);
 						break;
 						
 						case BlendMode.LIGHTEN:
@@ -286,6 +422,10 @@ function BitmapData(width, height, transparent, fillColor) {
 		
 		sourceMatrix = matrix || new Matrix();
 		sourceRect = clipRect || new Rectangle(0, 0, source.width, source.height);
+		
+		if(blendMode && this.gpuEnabled) {
+			// TO DO
+		}
 		
 		this.drawingCanvas.setAttribute('width', source.width);
 		this.drawingCanvas.setAttribute('height', source.height);
@@ -430,7 +570,6 @@ function BitmapData(width, height, transparent, fillColor) {
 				data[pos+0] = (channelOptions & redChannel) ? (1 * cr) : 0x00;
 				data[pos+1] = (channelOptions & greenChannel) ? (1 * cg) : 0x00;
 				data[pos+2] = (channelOptions & blueChannel) ? (1 * cb) : 0x00;
-				data[pos+3] = 0xff;
 			}
 		}	
 	};
@@ -470,9 +609,9 @@ function BitmapData(width, height, transparent, fillColor) {
 			for(var x=0; x<this.width; x++) {
 				pos = (x + y * this.width) * 4;
 				
-				cr = (channelOptions & redChannel) ? parseInt(((this.simplexR.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
-				cg = (channelOptions & greenChannel) ? parseInt(((this.simplexG.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
-				cb = (channelOptions & blueChannel) ? parseInt(((this.simplexB.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cr = (channelOptions & redChannel) ? Math.floor(((this.simplexR.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cg = (channelOptions & greenChannel) ? Math.floor(((this.simplexG.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
+				cb = (channelOptions & blueChannel) ? Math.floor(((this.simplexB.noise(x/baseX, y/baseY)+1)*0.5)*255) : 0x00;
 
 				if(grayScale) {
 					gray = (cr + cg + cb) / numChannels;
@@ -482,12 +621,12 @@ function BitmapData(width, height, transparent, fillColor) {
 				data[pos+0] = cr;
 				data[pos+1] = cg;
 				data[pos+2] = cb;
-				data[pos+3] = 0xff;
 			}
 		}
 	};
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);
+	else this.fillRect(this.rect, 0);
 	return this;
 };
 
