@@ -630,8 +630,6 @@ function BitmapData(width, height, transparent, fillColor) {
 		mask = mask || 0xffffff;
 		copySource = copySource || false;
 		
-		//this.context.putImageData(this.imagedata, 0, 0);
-		
 		var bw = this.canvas.width - sourceRect.width - destPoint.x;
 		var bh = this.canvas.height - sourceRect.height - destPoint.y
 
@@ -640,7 +638,6 @@ function BitmapData(width, height, transparent, fillColor) {
 		
 		var sourceData = sourceBitmapData.imagedata.data;
 		var sourcePos, destPos, sourceHex;
-		var data = this.imagedata.data;
 		
 		for (var y=0; y<dh; y++) {
 			for (var x=0; x<dw; x++) {

@@ -69,7 +69,7 @@ rect = new Rectangle(100, 100, 200, 200);
 point = new Point(50, 50);
 setInterval(function() {
 	bikesData.draw(bikes);
-	bikesData.threshold(lennaData, rect, point, "<", threshold, 0x00ff00, null, true);
+	bikesData.threshold(lennaData, rect, point, "&lt;", threshold, 0x00ff00, null, true);
 
 	if(threshold >= 0xffffff) threshold = 0x333333;
 	else threshold += 0x00eeee;
