@@ -235,6 +235,32 @@ function BitmapData(width, height, transparent, fillColor) {
 		return result;
 	};
 	
+	this.colorTransform=function(rect, colorTransform)
+	{
+		rect=rect || this.rect;
+		colorTransform=colorTransform || new ColorTransform();
+		
+		var data=this.imagedata.data;
+		var xMax=rect.x+rect.height;
+		var yMax=rect.y+rect.height;
+	
+		for(var y=rect.y;y<yMax;y++)
+		{
+			for(var x=rect.x;x<xMax;x++)
+			{
+				var r=(y*this.width+x)*4;
+				var g=r+1;
+				var b=r+2
+				var a=r+3;
+				
+				data[r]=data[r]*colorTransform.redMultiplier+colorTransform.redOffset;
+				data[g]=data[g]*colorTransform.greenMultiplier+colorTransform.greenOffset;
+				data[b]=data[b]*colorTransform.blueMultiplier+colorTransform.blueOffset;
+				data[a]=data[a]*colorTransform.alphaMultiplier+colorTransform.alphaOffset;
+			}
+		}
+	}
+	
 	this.applyFilter = function(sourceBitmapData, sourceRect, destPoint, filter) {
 		var copy = this.clone();
 		filter.run(sourceRect, this.imagedata.data, copy.imagedata.data);
