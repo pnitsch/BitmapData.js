@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title>ColorMatrixFilter Example</title> 
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
+		<script type="text/javascript" src="js/Point.js"></script>
+		<script type="text/javascript" src="js/Rectangle.js"></script>
+		<script type="text/javascript" src="js/Matrix.js"></script>
+		<script type="text/javascript" src="js/filters/ColorMatrixFilter.js"></script>
+		<script type="text/javascript" src="js/BitmapData.js"></script>
+		<script> 
+			function init()
+			{
+				canvas = document.getElementById("canvas");
+				canvas2 = document.getElementById("canvas2");
+				
+				bikes = new Image();
+				bikes.src = "res/bikes.png";
+				bikesData = new BitmapData(300, 300);
+				
+				var invertMatrix=[
+									-1, 0, 0, 0, 255,
+									0, -1, 0, 0, 255,
+									0, 0, -1, 0, 255,
+									0, 0, 0, 1, 0
+								 ];
+								 		 
+				var brightness=[
+									2, 0, 0, 0, 0,
+									0, 2, 0, 0, 0,
+									0, 0, 2, 0, 0,
+									0, 0, 0, 1, 0
+								 ];
+				
+				var invertFilter=new ColorMatrixFilter(invertMatrix);
+				var brightnessFilter=new ColorMatrixFilter(brightness);
+				
+				var zeroPoint=new Point();
+				
+				bikesData.draw(bikes);
+				bikesData.applyFilter(bikesData, bikesData.rect, zeroPoint, invertFilter);
+				context = canvas.getContext("2d");
+				context.putImageData(bikesData.data, 0, 0);
+				
+				bikesData.draw(bikes);
+				bikesData.applyFilter(bikesData, bikesData.rect, zeroPoint, brightnessFilter);
+				context = canvas2.getContext("2d");
+				context.putImageData(bikesData.data, 0, 0);
+			};
+		</script>
+	</head> 
+	<body onload="init();"> 
+		<div id="container">
+			<div id="example-container">
+				<div class="example">
+					
+					<img id="bikes" src="res/bikes.png" width="300" height="300" /><br>
+					<canvas id="canvas" width="300" height="300"></canvas><br>
+					<canvas id="canvas2" width="300" height="300"></canvas><br>
+
+				</div> 
+				<div class="code">
+					<pre>
+canvas = document.getElementById("canvas");
+canvas2 = document.getElementById("canvas2");
+
+bikes = new Image();
+bikes.src = "res/bikes.png";
+bikesData = new BitmapData(300, 300);
+
+var invertMatrix=[
+					-1, 0, 0, 0, 255,
+					0, -1, 0, 0, 255,
+					0, 0, -1, 0, 255,
+					0, 0, 0, 1, 0
+				 ];
+				 		 
+var brightness=[
+					2, 0, 0, 0, 0,
+					0, 2, 0, 0, 0,
+					0, 0, 2, 0, 0,
+					0, 0, 0, 1, 0
+				 ];
+
+var invertFilter=new ColorMatrixFilter(invertMatrix);
+var brightnessFilter=new ColorMatrixFilter(brightness);
+
+var zeroPoint=new Point();
+
+bikesData.draw(bikes);
+bikesData.applyFilter(bikesData, bikesData.rect, zeroPoint, invertFilter);
+context = canvas.getContext("2d");
+context.putImageData(bikesData.data, 0, 0);
+
+bikesData.draw(bikes);
+bikesData.applyFilter(bikesData, bikesData.rect, zeroPoint, brightnessFilter);
+context = canvas2.getContext("2d");
+context.putImageData(bikesData.data, 0, 0);
+					</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="index.html">back</a></li>
+				</ul>
+			</div>
+		</div>
+	</body> 
+</html>
