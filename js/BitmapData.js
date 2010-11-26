@@ -50,13 +50,13 @@ function PRNG() {
 	this.gen = function() { return this.seed = (this.seed * 16807) % 2147483647; };
 };
 
-function BitmapData(width, height, transparent, fillColor) {
+function BitmapData(width, height, transparent, fillColor, canvas) {
 	this.width = width;
 	this.height = height;
 	this.rect = new Rectangle(0, 0, this.width, this.height);
 	this.transparent = transparent || false;
 
-	this.canvas = document.createElement("canvas");
+	this.canvas = canvas || document.createElement("canvas");
 	this.context = this.canvas.getContext("2d");
 	this.canvas.setAttribute('width', this.width);
 	this.canvas.setAttribute('height', this.height);
@@ -718,10 +718,10 @@ function BitmapData(width, height, transparent, fillColor) {
 	return this;
 };
 
-Image.prototype.__defineGetter__("bitmapData", function() { 
+HTMLCanvasElement.prototype._bitmapData = null;
+HTMLCanvasElement.prototype.__defineGetter__("bitmapData", function() { 
 	if(!this._bitmapData) {
-		this._bitmapData = new BitmapData(this.width, this.height);
-		this._bitmapData.draw(this);
+		this._bitmapData = new BitmapData(this.width, this.height, false, 0, this);
 	}
-	return this._bitmapData; 
+	return this._bitmapData;
 });  	
