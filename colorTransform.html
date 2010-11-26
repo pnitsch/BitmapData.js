@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head> 
-		<title>BitmapData.js</title> 
+		<title>ColorTransform Example</title> 
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="css/global.css" type="text/css" />
 		<script type="text/javascript" src="js/Point.js"></script>
@@ -10,7 +10,8 @@
 		<script type="text/javascript" src="js/ColorTransform.js"></script>
 		<script type="text/javascript" src="js/BitmapData.js"></script>
 		<script> 
-			function init(){
+			function init()
+			{
 				canvas = document.getElementById("canvas");
 				context = canvas.getContext("2d");
 
@@ -25,19 +26,14 @@
 				bikesData.colorTransform(rect, colorTrans);
 				
 				context.putImageData(bikesData.data, 0, 0);
-			};	
+			};		
 		</script>
 	</head> 
 	<body onload="init();"> 
 		<div id="container">
-			<div id="title">BitmapData.js</div>
-			<div id="description">
-				<a href="https://github.com/pnitsch/BitmapData.js">github</a>
-				<p>HTML5 Canvas API implementation of the AS3 BitmapData class.</p>
-				<p></p></div>
 			<div id="example-container">
 				<div class="example">
-					<canvas id="canvas" width="256" height="256"></canvas>
+					<canvas id="canvas" width="300" height="300"></canvas><br>
 				</div> 
 				<div class="code">
 					<pre>
@@ -61,11 +57,7 @@ context.putImageData(bikesData.data, 0, 0);
 			<div class="break"><img src="res/break.gif"></div>
 			<div id="links">
 				<ul>
-					<li><a href="channels.html">BitmapDataChannel example</a></li>
-					<li><a href="blendmodes.html">Blendmodes example</a></li>
-					<li><a href="noise.html">Perlin Noise example</a></li>
-					<li><a href="plasma.html">Plasma example</a></li>
-					<li><a href="rotozoomer.html">Rotozoomer example</a></li>
+					<li><a href="index.html">back</a></li>
 				</ul>
 			</div>
 		</div>
