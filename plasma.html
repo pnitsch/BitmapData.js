@@ -12,25 +12,24 @@
 			function init(){
 				canvas = document.getElementById("canvas");
 				context = canvas.getContext("2d");
+				bmd = canvas.bitmapData;
 
 				function dist(a, b, c, d) {
 					return Math.sqrt(((a - c) * (a - c) + (b - d) * (b - d)));
 				}
-
-				bmd = new BitmapData(250, 250);
 
 				setInterval(function(){
 					time = new Date().getTime()/50;
 
 					for(y=0; y<bmd.height; y++) {
 						for(x=0; x<bmd.width; x++) {
-							rgb = Math.sin(dist(x + time, y, 128.0, 128.0) / 8.0)
+							rgb = Math.sin(dist(x+time, y, 128.0, 128.0) / 8.0)
 								+ Math.sin(dist(x, y, 64.0, 64.0) / 8.0)
-								+ Math.sin(dist(x, y + time / 7, 192.0, 64) / 7.0)
+								+ Math.sin(dist(x, y+time/7, 192.0, 64) / 7.0)
 								+ Math.sin(dist(x, y, 192.0, 100.0) / 8.0);
 
-							color = parseInt(4+rgb)*32;
-							bmd.setPixel(x, y, color<<16 | (color*2)<<8 | 255-color);
+							c = parseInt(4+rgb)*32;
+							bmd.setPixel(x, y, c<<16 | (c*2)<<8 | 255-c);
 						}
 					}
 
@@ -42,38 +41,36 @@
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
-					<canvas id="canvas" width="250" height="250"></canvas><br>
+				<div id="example">
+					<canvas id="canvas" width="300" height="150"></canvas><br>
 				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
+				<div id="code">
+					<pre>canvas = document.getElementById("canvas");
 context = canvas.getContext("2d");
+bmd = canvas.bitmapData;
 
 function dist(a, b, c, d) {
 	return Math.sqrt(((a - c) * (a - c) + (b - d) * (b - d)));
 }
-
-bmd = new BitmapData(200, 200);
 
 setInterval(function(){
 	time = new Date().getTime()/50;
 
 	for(y=0; y&lt;bmd.height; y++) {
 		for(x=0; x&lt;bmd.width; x++) {
-			rgb = Math.sin(dist(x + time, y, 128.0, 128.0) / 8.0)
+			rgb = Math.sin(dist(x+time, y, 128.0, 128.0) / 8.0)
 				+ Math.sin(dist(x, y, 64.0, 64.0) / 8.0)
-				+ Math.sin(dist(x, y + time / 7, 192.0, 64) / 7.0)
+				+ Math.sin(dist(x, y+time/7, 192.0, 64) / 7.0)
 				+ Math.sin(dist(x, y, 192.0, 100.0) / 8.0);
 
-			color = parseInt(4+rgb)*32;
-			bmd.setPixel(x, y, color&lt;&lt;16 | (color*2)&lt;&lt;8 | 255-color);
+			c = parseInt(4+rgb)*32;
+			bmd.setPixel(x, y, c&lt;&lt;16 | (c*2)&lt;&lt;8 | 255-c);
 		}
 	}
 
 	context.putImageData(bmd.data, 0, 0);
-}, 10);
-				</pre></div>
+}, 10);</pre>
+					</div>
 			</div>
 			<div class="break"><img src="res/break.gif"></div>
 			<div id="links">

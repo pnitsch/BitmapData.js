@@ -1,31 +1,43 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head> 
-		<title>Rotozoomer Example</title> 
+		<title>GPU Example</title> 
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="css/global.css" type="text/css" />
 		<script type="text/javascript" src="js/Point.js"></script>
 		<script type="text/javascript" src="js/Rectangle.js"></script>
 		<script type="text/javascript" src="js/Matrix.js"></script>
+		<script type="text/javascript" src="js/modes/Difference.js"></script>
 		<script type="text/javascript" src="js/BitmapData.js"></script>
 		<script> 
-			function init(){
-				bmd = document.getElementById("canvas").bitmapData;
+		
+			function initGL() {
+				canvas = document.getElementById("canvas");
+				context = canvas.getContext("2d");
 
 				lenna = new Image();
-				lenna.src = "res/lenna-300x300.png";
-				
-				clipping = new Rectangle(10, 10, 280, 280);
-				rotoMatrix = new Matrix(1, 0, 0, 1, 150, 150);
-				
-				zoomMax = 0.2;
-				zoomMin = -0.4;
-				dz = 0.015;
-				dr= 0.01;
+				lenna.src = "res/tex7.jpg";
+
+				large = new Image();
+				large.src = "res/tex0.jpg";
+
+				var bmd = new BitmapData(512, 512, false, 0xff0000);
+				bmd.initProgram(Difference);
+				bmd.initTexture(0, lenna);
+				bmd.initTexture(1, large);
+			
+				clipping = new Rectangle(0, 0, 512, 512);
+				point = new Point(0, 0);
+				rotoMatrix = new Matrix(1, 0, 0, 1, 150.0, 150.0);
+
+				zoomMax = 30.0;
+				zoomMin = -20.0;
+				dz = 0.025;
+				dr= 0.02;
 				angle = 0;
 				zoom = zoomMin;
 				isZoomIncreasing = true;
-				
+					
 				setInterval(function() {
 					if ( isZoomIncreasing )	zoom = zoom + dz;
 					else zoom = zoom - dz;	
@@ -46,33 +58,46 @@
 					rotoMatrix.b = Math.sin(angle);
 					rotoMatrix.c = -Math.sin(angle);
 					rotoMatrix.d = Math.cos(angle) * zoom;
-					
-					
-					bmd.draw(lenna, rotoMatrix, null, null, null);
-				}, 20);
-			};	
+
+					bmd.drawGL(rotoMatrix);
+
+					context.putImageData(bmd.data, 0, 0);
+				}, 10);
+
+			}
 		</script>
 	</head> 
-	<body onload="init();"> 
+	<body onload="initGL();"> 
 		<div id="container">
 			<div id="example-container">
 				<div id="example">
-					<canvas id="canvas" width="300" height="300"></canvas>
-					<img id="lenna" src="res/lenna-300x300.png" width="300" height="300" />
+					<canvas id="canvas" width="300" height="300"></canvas><br>
+					<img id="large" src="res/tex0.jpg" width="150" height="150" />
+					<img id="lenna" src="res/tex7.jpg" width="150" height="150" />
 				</div> 
 				<div id="code">
-					<pre>bmd = document.getElementById("canvas").bitmapData;
+					<pre>canvas = document.getElementById("canvas");
+context = canvas.getContext("2d");
 
 lenna = new Image();
-lenna.src = "res/lenna-300x300.png";
+lenna.src = "res/tex7.jpg";
 
-clipping = new Rectangle(10, 10, 280, 280);
-rotoMatrix = new Matrix(1, 0, 0, 1, 150, 150);
+large = new Image();
+large.src = "res/tex0.jpg";
 
-zoomMax = 0.2;
-zoomMin = -0.4;
-dz = 0.015;
-dr= 0.01;
+var bmd = new BitmapData(512, 512, false, 0xff0000);
+bmd.initProgram(Difference);
+bmd.initTexture(0, lenna);
+bmd.initTexture(1, large);
+
+clipping = new Rectangle(0, 0, 512, 512);
+point = new Point(0, 0);
+rotoMatrix = new Matrix(1, 0, 0, 1, 150.0, 150.0);
+
+zoomMax = 30.0;
+zoomMin = -20.0;
+dz = 0.025;
+dr= 0.02;
 angle = 0;
 zoom = zoomMin;
 isZoomIncreasing = true;
@@ -98,9 +123,11 @@ setInterval(function() {
 	rotoMatrix.c = -Math.sin(angle);
 	rotoMatrix.d = Math.cos(angle) * zoom;
 
+	bmd.drawGL(rotoMatrix);
 
-	bmd.draw(lenna, rotoMatrix, null, null, null);
-}, 20);	</pre>
+	context.putImageData(bmd.data, 0, 0);
+}, 10);
+					</pre>
 				</div>
 			</div>
 			<div class="break"><img src="res/break.gif"></div>

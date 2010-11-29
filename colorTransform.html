@@ -12,45 +12,38 @@
 		<script> 
 			function init()
 			{
-				canvas = document.getElementById("canvas");
-				context = canvas.getContext("2d");
+				bmd = document.getElementById("canvas").bitmapData;
 
 				bikes = new Image();
 				bikes.src = "res/bikes.png";
-				bikesData = new BitmapData(300, 300);
-				bikesData.draw(bikes);
+
+				bmd.draw(bikes);
 				
-				colorTrans=new ColorTransform(1, 0, 1, 1, 180);
-				rect=new Rectangle(20, 20, 100, 100);
+				colorTrans = new ColorTransform(1, 0, 1, 1, 180);
+				rect = new Rectangle(20, 20, 100, 100);
 				
-				bikesData.colorTransform(rect, colorTrans);
-				
-				context.putImageData(bikesData.data, 0, 0);
+				bmd.colorTransform(rect, colorTrans);
 			};		
 		</script>
 	</head> 
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
+				<div id="example">
 					<canvas id="canvas" width="300" height="300"></canvas><br>
 				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
-context = canvas.getContext("2d");
+				<div id="code">
+					<pre>bmd = document.getElementById("canvas").bitmapData;
 
 bikes = new Image();
 bikes.src = "res/bikes.png";
-bikesData = new BitmapData(300, 300);
-bikesData.draw(bikes);
 
-colorTrans=new ColorTransform(1, 0, 1, 1, 180);
-rect=new Rectangle(20, 20, 100, 100);
+bmd.draw(bikes);
 
-bikesData.colorTransform(rect, colorTrans);
+colorTrans = new ColorTransform(1, 0, 1, 1, 180);
+rect = new Rectangle(20, 20, 100, 100);
 
-context.putImageData(bikesData.data, 0, 0);
+bmd.colorTransform(rect, colorTrans);
 					</pre>
 				</div>
 			</div>

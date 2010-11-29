@@ -19,7 +19,7 @@
 				bikesData.draw(bikes);
 				
 				lenna = new Image();
-				lenna.src = "res/Lenna.png";
+				lenna.src = "res/lenna-300x300.png";
 				lennaData = new BitmapData(300, 300);
 				lennaData.draw(lenna);
 
@@ -28,7 +28,14 @@
 				point = new Point(50, 50);
 				setInterval(function() {
 					bikesData.draw(bikes);
-					bikesData.threshold(lennaData, rect, point, "<", threshold, 0x00ff00, null, true);
+					bikesData.threshold(lennaData, 
+						rect, 
+						point, 
+						"<", 
+						threshold, 
+						0x00ff00, 
+						null, 
+						true);
 					
 					if(threshold >= 0xffffff) threshold = 0x333333;
 					else threshold += 0x00eeee;
@@ -40,18 +47,17 @@
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
+				<div id="example">
 					
 					
 					<canvas id="canvas" width="300" height="300"></canvas><br>
 					<img id="bikes" src="res/bikes.png" width="150" height="150" />
-					<img id="lenna" src="res/Lenna.png" width="150" height="150" /><br>
+					<img id="lenna" src="res/lenna-300x300.png" width="150" height="150" /><br>
 					
 					
 				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
+				<div id="code">
+					<pre>canvas = document.getElementById("canvas");
 context = canvas.getContext("2d");
 
 bikes = new Image();
@@ -60,7 +66,7 @@ bikesData = new BitmapData(300, 300);
 bikesData.draw(bikes);
 
 lenna = new Image();
-lenna.src = "res/Lenna.png";
+lenna.src = "res/lenna-300x300.png";
 lennaData = new BitmapData(300, 300);
 lennaData.draw(lenna);
 
@@ -69,13 +75,19 @@ rect = new Rectangle(100, 100, 200, 200);
 point = new Point(50, 50);
 setInterval(function() {
 	bikesData.draw(bikes);
-	bikesData.threshold(lennaData, rect, point, "&lt;", threshold, 0x00ff00, null, true);
+	bikesData.threshold(lennaData, 
+		rect, 
+		point, 
+		"<", 
+		threshold, 
+		0x00ff00, 
+		null, 
+		true);
 
 	if(threshold >= 0xffffff) threshold = 0x333333;
 	else threshold += 0x00eeee;
 	context.putImageData(bikesData.data, 0, 0);
-}, 10);
-					</pre>
+}, 10);</pre>
 				</div>
 			</div>
 			<div class="break"><img src="res/break.gif"></div>

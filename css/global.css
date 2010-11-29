@@ -2,6 +2,7 @@ body {
 	width: 100%;
 	margin: 0;
 	color: #363636; 
+	background: #ffffff;
 	font: 14px Georgia, "Times New Roman", Times, serif;
 }
 
@@ -11,17 +12,7 @@ a {
 	text-decoration: none;
 }
 
-#example {
-	width: 100%;
-}
 
-#example #canvas {
-	float:left;
-}
-
-#example img {
-	float:left;
-}
 
 a:hover {
 	color: #000000; 
@@ -30,33 +21,91 @@ a:hover {
 
 #container {
 	margin: 20px 40px;
+	width: 800px;
 
+}
+
+#header {
+	width: 800px;
+
+	overflow:hidden;
 }
 
 #title {
 	color: #000000;
 	font-size: 44px;
+	width: 700px;
+	float:left;
+}
+
+#git {
+
+	font-size: 18px;
+	float:right;
+	padding-top:24px;
 }
 
 #description {
 	font-size: 16px;
+	float:left;
 }
 
-.code pre {
+#example-container {
+	width: 800px;
+	clear:both;
+}
+
+#example {
+	width: 350px;
+	float:left;
+}
+
+
+
+#example img {
+	float:left;
+	
+}
+
+#code {
+	width: 400px;
+	float: left;
+	margin-top: -15px;
+}
+
+#code pre {
 	font-family: Courier, fixed;
 	font-size: 12px;
 }
 
 .break {
-	width:42px;
+	width:800px;
 	height:2px;
+	padding-bottom:30px;
 	clear: both;
 }
 
+.break img{
+	width:800px;
+	height:2px;
+}
+
+#examples-links {
+	width: 800px;
+}
+
+#examples-title {
+	font-size: 24px;
+	float:left;
+	width:150px;
+	margin-bottom:15px;
+}
+
 #links {
+	width: 400px;
+	float:left;
 	padding-bottom: 50px;
-	margin: 0 -40px;
-	clear: both;
+	margin: -9px -40px;
 }
 
 #links ul {

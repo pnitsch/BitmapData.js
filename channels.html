@@ -10,51 +10,50 @@
 		<script type="text/javascript" src="js/BitmapData.js"></script>
 		<script> 
 			function init(){
-				canvas = document.getElementById("canvas");
-				context = canvas.getContext("2d");
+				bmd = document.getElementById("canvas").bitmapData;
 
 				bikes = new Image();
 				bikes.src = "res/bikes.png";
-				bikesData = new BitmapData(300, 300);
-				bikesData.draw(bikes);
+				bmd.draw(bikes);
 				
 				lenna = new Image();
-				lenna.src = "res/Lenna.png";
-				leenaData = new BitmapData(512, 512);
+				lenna.src = "res/lenna-300x300.png";
+				leenaData = new BitmapData(300, 300);
 				leenaData.draw(lenna);
 				
-				bikesData.copyChannel(leenaData, new Rectangle(150, 150, 200, 200), new Point(50, 50), BitmapDataChannel.RED, BitmapDataChannel.GREEN);
-
-				context.putImageData(bikesData.data, 0, 0);
+				bmd.copyChannel(leenaData, 
+					new Rectangle(50, 50, 200, 200), 
+					new Point(50, 50), 
+					BitmapDataChannel.GREEN, 
+					BitmapDataChannel.GREEN);
 			};	
 		</script>
 	</head> 
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
+				<div id="example">
 					<canvas id="canvas" width="300" height="300"></canvas><br>
 					<img id="bikes" src="res/bikes.png" width="150" height="150" />
-					<img id="lenna" src="res/Lenna.png" width="150" height="150" />
+					<img id="lenna" src="res/lenna-300x300.png" width="150" height="150" />
 				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
-context = canvas.getContext("2d");
+				<div id="code">
+					<pre>bmd = document.getElementById("canvas").bitmapData;
 
 bikes = new Image();
 bikes.src = "res/bikes.png";
-bikesData = new BitmapData(300, 300);
-bikesData.draw(bikes);
+bmd.draw(bikes);
 
 lenna = new Image();
-lenna.src = "res/Lenna.png";
-leenaData = new BitmapData(512, 512);
+lenna.src = "res/lenna-300x300.png";
+leenaData = new BitmapData(300, 300);
 leenaData.draw(lenna);
 
-bikesData.copyChannel(leenaData, new Rectangle(150, 150, 200, 200), new Point(50, 50), BitmapDataChannel.RED, BitmapDataChannel.GREEN);
-
-context.putImageData(bikesData.data, 0, 0);
+bmd.copyChannel(leenaData, 
+	new Rectangle(50, 50, 200, 200), 
+	new Point(50, 50), 
+	BitmapDataChannel.GREEN, 
+	BitmapDataChannel.GREEN);
 					</pre>
 				</div>
 			</div>

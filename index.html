@@ -10,64 +10,87 @@
 		<script type="text/javascript" src="js/BitmapData.js"></script>
 		<script> 
 			function init(){
-				canvas = document.getElementById("canvas");
-				context = canvas.getContext("2d");
+				bmd = document.getElementById("canvas").bitmapData;
 
-				bmd = new BitmapData(256, 256, false, 0xff0000);
-
-				color = 0x000000;
-				for(y=0; y<bmd.height; y++) {
-					for(x=0; x<bmd.width; x++) {
-						bmd.setPixel(x, y, color+=0xff);
+				for (var i = 0; i<100; i++) {
+					for (var j = 0; j<300; j++) {
+						var d = Math.pow(i-50, 2) + Math.pow(j-150, 2);
+						var r = Math.sin(Math.sqrt(d) * 10 * Math.PI/180);
+						var color = 100 + 100 * r << 16;
+						bmd.setPixel( i, j, color );
 					}
 				}
 				
-				bmd.fillRect(new Rectangle(156, 156, 100, 100), 0xdd00dd);
+				bmd.copyChannel(bmd, 
+					bmd.rect, 
+					new Point(100, 0), 
+					BitmapDataChannel.RED, 
+					BitmapDataChannel.GREEN);
+					
+				bmd.copyChannel(bmd, 
+					bmd.rect, 
+					new Point(200, 0), 
+					BitmapDataChannel.RED, 
+					BitmapDataChannel.BLUE);
 	
-				context.putImageData(bmd.data, 0, 0);
 			};	
 		</script>
 	</head> 
 	<body onload="init();"> 
 		<div id="container">
-			<div id="title">BitmapData.js</div>
-			<div id="description">
-				<a href="https://github.com/pnitsch/BitmapData.js">github</a>
-				<p>HTML5 Canvas API implementation of the AS3 BitmapData class.</p>
-				<p></p></div>
-			<div id="example-container">
-				<div class="example">
-					<canvas id="canvas" width="256" height="256"></canvas>
-				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
-context = canvas.getContext("2d");
-
-bmd = new BitmapData(256, 256, false, 0xff0000);
-
-color = 0x000000;
-for(y=0; y&lt;bmd.height; y++) {
-	for(x=0; x&lt;bmd.width; x++) {
-		bmd.setPixel(x, y, color+=0xff);
-	}
-}
-
-bmd.fillRect(new Rectangle(156, 156, 100, 100), 0xdd00dd);
-
-context.putImageData(bmd.data, 0, 0);
-					</pre>
+			<div id="header">
+				<div id="title">BitmapData.js</div>
+				<div id="git"><a href="https://github.com/pnitsch/BitmapData.js">github</a></div>
+				<div id="description">
+					<p>HTML5 Canvas API implementation of the AS3 BitmapData class.</p>
 				</div>
 			</div>
 			<div class="break"><img src="res/break.gif"></div>
-			<div id="links">
-				<ul>
-					<li><a href="channels.html">BitmapDataChannel example</a></li>
-					<li><a href="blendmodes.html">Blendmodes example</a></li>
-					<li><a href="noise.html">Perlin Noise example</a></li>
-					<li><a href="plasma.html">Plasma example</a></li>
-					<li><a href="rotozoomer.html">Rotozoomer example</a></li>
-				</ul>
+			<div id="example-container">
+				<div id="example">
+					<canvas id="canvas" width="300" height="300"></canvas>
+				</div> 
+				<div id="code">
+					<pre>bmd = document.getElementById("canvas").bitmapData;
+
+for (var i = 0; i&lt;100; i++) {
+	for (var j = 0; j&lt;300; j++) {
+		var d = Math.pow(i-50, 2) + Math.pow(j-150, 2);
+		var r = Math.sin(Math.sqrt(d) * 10 * Math.PI/180);
+		var color = 100 + 100 * r << 16;
+		bmd.setPixel( i, j, color );
+	}
+}
+
+bmd.copyChannel(bmd, 
+	bmd.rect, 
+	new Point(100, 0), 
+	BitmapDataChannel.RED, 
+	BitmapDataChannel.GREEN);
+	
+bmd.copyChannel(bmd, 
+	bmd.rect, 
+	new Point(200, 0), 
+	BitmapDataChannel.RED, 
+	BitmapDataChannel.BLUE);</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="example-links">
+				<div id="examples-title">Examples:</div>
+				<div id="links">
+					<ul>
+						<li><a href="channels.html">BitmapDataChannel example</a></li>
+						<li><a href="blendmodes.html">Blendmodes example</a></li>
+						<li><a href="colorMatrixFilter.html">ColorMatrixFilter example</a></li>
+						<li><a href="colorTransform.html">ColorTransform example</a></li>
+						<li><a href="noise.html">Perlin Noise example</a></li>
+						<li><a href="plasma.html">Plasma example</a></li>
+						<li><a href="rotozoomer.html">Rotozoomer example</a></li>
+						<li><a href="threshold.html">Threshold example</a></li>
+						<li><a href="gpu.html">GPU example (experimental, requires WebGL)</a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
 	</body> 

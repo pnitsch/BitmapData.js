@@ -10,8 +10,7 @@
 		<script type="text/javascript" src="js/BitmapData.js"></script>
 		<script> 
 			function init(){
-				canvas = document.getElementById("canvas");
-				context = canvas.getContext("2d");
+				bmd = document.getElementById("canvas").bitmapData;
 				log = document.getElementById("log");
 				
 				blendModeArray = [
@@ -31,16 +30,12 @@
 				bikes.src = "res/bikes.png";
 				
 				lenna = new Image();
-				lenna.src = "res/Lenna.png";
-				
-				bmd = new BitmapData(300, 300);
-				bmd.draw(bikes);
+				lenna.src = "res/lenna-300x300.png";
 
 				counter = 0;
 				function cycle() {
 					bmd.draw(bikes);
-					bmd.draw(lenna, new Matrix(1, 0, 0, 1, -50, -50), null, blendModeArray[counter].mode);
-					context.putImageData(bmd.data, 0, 0);
+					bmd.draw(lenna, null, null, blendModeArray[counter].mode);
 					
 					log.innerHTML = blendModeArray[counter].name;
 					
@@ -53,27 +48,24 @@
 				
 				cycle();
 				setInterval(cycle, 2000);
-				
 			};	
 		</script>
 	</head> 
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
+				<div id="example">
 					
 					
 					<canvas id="canvas" width="300" height="300"></canvas><br>
 					<p><strong>Mode: <span id="log">Title</span></strong></p>
 					<img id="bikes" src="res/bikes.png" width="150" height="150" />
-					<img id="lenna" src="res/Lenna.png" width="150" height="150" /><br>
+					<img id="lenna" src="res/lenna-300x300.png" width="150" height="150" /><br>
 					
 					
 				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
-context = canvas.getContext("2d");
+				<div id="code">
+					<pre>bmd = document.getElementById("canvas").bitmapData;
 log = document.getElementById("log");
 
 blendModeArray = [
@@ -93,16 +85,12 @@ bikes = new Image();
 bikes.src = "res/bikes.png";
 
 lenna = new Image();
-lenna.src = "res/Lenna.png";
-
-bmd = new BitmapData(300, 300);
-bmd.draw(bikes);
+lenna.src = "res/lenna-300x300.png";
 
 counter = 0;
 function cycle() {
 	bmd.draw(bikes);
-	bmd.draw(lenna, new Matrix(1, 0, 0, 1, -50, -50), null, blendModeArray[counter].mode);
-	context.putImageData(bmd.data, 0, 0);
+	bmd.draw(lenna, null, null, blendModeArray[counter].mode);
 
 	log.innerHTML = blendModeArray[counter].name;
 
@@ -114,8 +102,7 @@ function cycle() {
 }
 
 cycle();
-setInterval(cycle, 2000);
-					</pre>
+setInterval(cycle, 2000);</pre>
 				</div>
 			</div>
 			<div class="break"><img src="res/break.gif"></div>

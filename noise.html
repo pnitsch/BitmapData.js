@@ -12,44 +12,35 @@
 		
 		<script> 
 			function init(){
-				canvas = document.getElementById("canvas");
-				context = canvas.getContext("2d");
-
-				var bmd = new BitmapData(400, 400);
+				var bmd = document.getElementById("canvas").bitmapData;
+				
 				bmd.perlinNoise(
-					bmd.width/2, 										// baseX
-					bmd.height/2, 										// baseY
-					parseInt(Math.random()*0xffff), 					// seed
-					BitmapDataChannel.RED | BitmapDataChannel.BLUE, 	// channel options
-					false // gray-scale
-				);
-
-				context.putImageData(bmd.data, 0, 0);	
+					bmd.width/2, 			
+					bmd.height/2, 								
+					Math.floor(Math.random()*0xffff), 
+					BitmapDataChannel.RED | BitmapDataChannel.BLUE,
+					false 
+				);	
 			};	
 		</script>
 	</head> 
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
-					<canvas id="canvas" width="400" height="400"></canvas>
+				<div id="example">
+					<canvas id="canvas" width="300" height="300"></canvas>
 
 				</div> 
-				<div class="code">
-					<pre>
-canvas = document.getElementById("canvas");
-context = canvas.getContext("2d");
-
-var bmd = new BitmapData(400, 400);
+				<div id="code">
+					<pre>var bmd = document.getElementById("canvas").bitmapData;
+						
 bmd.perlinNoise(
-	bmd.width/2,	// baseX
-	bmd.height/2,	// baseY
-	parseInt(Math.random()*0xffff),	// seed
-	BitmapDataChannel.RED | BitmapDataChannel.BLUE,	// channel options
-	false // gray-scale
+	bmd.width/2, 			
+	bmd.height/2, 								
+	Math.floor(Math.random()*0xffff), 
+	BitmapDataChannel.RED | BitmapDataChannel.BLUE,
+	false 
 );
-
-context.putImageData(bmd.data, 0, 0);
 					</pre>
 				</div>
 			</div>

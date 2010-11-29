@@ -269,7 +269,7 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 	this.compare = function(otherBitmapData) {
 		if(this.width != otherBitmapData.width) return -3;
 		if(this.height != otherBitmapData.height) return -4;
-		if(this.data === otherBitmapData.data) return 0; 
+		if(this.imagedata === otherBitmapData.data) return 0; 
 		
 		var otherRGB, thisRGB, dif;
 		var result = new BitmapData(this.width, this.height);
@@ -402,9 +402,10 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 				sourceRect.x, sourceRect.y, dw, dh, 
 				destPoint.x, destPoint.y, dw, dh);
 			
-			this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+			this.imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 		}
 		
+		this.context.putImageData(this.imagedata, 0, 0);
 	};
 	
 	this.copyChannel = function(sourceBitmapData, sourceRect, destPoint, sourceChannel, destChannel) {
@@ -433,6 +434,8 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 				this.setPixel(destPoint.x+x, destPoint.y+y, RGBToHex(rgb));
 			}
 		}
+		
+		this.context.putImageData(this.imagedata, 0, 0);
 	};
 	
 	this.copyPixels = function(sourceBitmapData, sourceRect, destPoint, alphaBitmapData, alphaPoint, mergeAlpha) {
@@ -477,7 +480,7 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 
 		this.context.fillStyle = "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";  
 		this.context.fillRect (rect.x, rect.y, rect.width, rect.height);
-		this.data = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+		this.imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
 	};
 	
 	this.floodFill = function(x, y, color) {
@@ -649,6 +652,8 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 				data[pos+2] = cb;
 			}
 		}
+		
+		this.context.putImageData(this.imagedata, 0, 0);
 	};
 	
 	this.threshold = function(sourceBitmapData, sourceRect, destPoint, operation, threshold, color, mask, copySource) {

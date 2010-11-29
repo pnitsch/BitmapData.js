@@ -53,14 +53,14 @@
 	<body onload="init();"> 
 		<div id="container">
 			<div id="example-container">
-				<div class="example">
+				<div id="example">
 					
 					<img id="bikes" src="res/bikes.png" width="300" height="300" /><br>
 					<canvas id="canvas" width="300" height="300"></canvas><br>
 					<canvas id="canvas2" width="300" height="300"></canvas><br>
 
 				</div> 
-				<div class="code">
+				<div id="code">
 					<pre>
 canvas = document.getElementById("canvas");
 canvas2 = document.getElementById("canvas2");
@@ -70,23 +70,23 @@ bikes.src = "res/bikes.png";
 bikesData = new BitmapData(300, 300);
 
 var invertMatrix=[
-					-1, 0, 0, 0, 255,
-					0, -1, 0, 0, 255,
-					0, 0, -1, 0, 255,
-					0, 0, 0, 1, 0
-				 ];
+		-1, 0, 0, 0, 255,
+		0, -1, 0, 0, 255,
+		0, 0, -1, 0, 255,
+		0, 0, 0, 1, 0
+	 ];
 				 		 
 var brightness=[
-					2, 0, 0, 0, 0,
-					0, 2, 0, 0, 0,
-					0, 0, 2, 0, 0,
-					0, 0, 0, 1, 0
-				 ];
+		2, 0, 0, 0, 0,
+		0, 2, 0, 0, 0,
+		0, 0, 2, 0, 0,
+		0, 0, 0, 1, 0
+	 ];
 
-var invertFilter=new ColorMatrixFilter(invertMatrix);
-var brightnessFilter=new ColorMatrixFilter(brightness);
+invertFilter = new ColorMatrixFilter(invertMatrix);
+brightnessFilter = new ColorMatrixFilter(brightness);
 
-var zeroPoint=new Point();
+zeroPoint=new Point();
 
 bikesData.draw(bikes);
 bikesData.applyFilter(bikesData, bikesData.rect, zeroPoint, invertFilter);
