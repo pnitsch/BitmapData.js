@@ -259,6 +259,8 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 				data[a]=data[a]*colorTransform.alphaMultiplier+colorTransform.alphaOffset;
 			}
 		}
+		
+		this.context.putImageData(this.imagedata, 0, 0);
 	}
 	
 	this.applyFilter = function(sourceBitmapData, sourceRect, destPoint, filter) {
@@ -716,6 +718,7 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 			}
 		}
 		
+		this.context.putImageData(this.imagedata, 0, 0);
 	};
 	
 	if(fillColor) this.fillRect(this.rect, fillColor);

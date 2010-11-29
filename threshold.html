@@ -10,13 +10,11 @@
 		<script type="text/javascript" src="js/BitmapData.js"></script>
 		<script> 
 			function init(){
-				canvas = document.getElementById("canvas");
-				context = canvas.getContext("2d");
+				bmd = document.getElementById("canvas").bitmapData;
 
 				bikes = new Image();
 				bikes.src = "res/bikes.png";
-				bikesData = new BitmapData(300, 300);
-				bikesData.draw(bikes);
+				bmd.draw(bikes);
 				
 				lenna = new Image();
 				lenna.src = "res/lenna-300x300.png";
@@ -27,8 +25,8 @@
 				rect = new Rectangle(100, 100, 200, 200);
 				point = new Point(50, 50);
 				setInterval(function() {
-					bikesData.draw(bikes);
-					bikesData.threshold(lennaData, 
+					bmd.draw(bikes);
+					bmd.threshold(lennaData, 
 						rect, 
 						point, 
 						"<", 
@@ -39,7 +37,6 @@
 					
 					if(threshold >= 0xffffff) threshold = 0x333333;
 					else threshold += 0x00eeee;
-					context.putImageData(bikesData.data, 0, 0);
 				}, 10);	
 			};	
 		</script>
@@ -57,13 +54,11 @@
 					
 				</div> 
 				<div id="code">
-					<pre>canvas = document.getElementById("canvas");
-context = canvas.getContext("2d");
+					<pre>bmd = document.getElementById("canvas").bitmapData;
 
 bikes = new Image();
 bikes.src = "res/bikes.png";
-bikesData = new BitmapData(300, 300);
-bikesData.draw(bikes);
+bmd.draw(bikes);
 
 lenna = new Image();
 lenna.src = "res/lenna-300x300.png";
@@ -74,11 +69,11 @@ threshold = 0x333333;
 rect = new Rectangle(100, 100, 200, 200);
 point = new Point(50, 50);
 setInterval(function() {
-	bikesData.draw(bikes);
-	bikesData.threshold(lennaData, 
+	bmd.draw(bikes);
+	bmd.threshold(lennaData, 
 		rect, 
 		point, 
-		"<", 
+		"&lt;", 
 		threshold, 
 		0x00ff00, 
 		null, 
@@ -86,7 +81,6 @@ setInterval(function() {
 
 	if(threshold >= 0xffffff) threshold = 0x333333;
 	else threshold += 0x00eeee;
-	context.putImageData(bikesData.data, 0, 0);
 }, 10);</pre>
 				</div>
 			</div>
