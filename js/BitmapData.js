@@ -605,6 +605,45 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 		}	
 	};
 	
+	this.paletteMap = function(sourceBitmapData, sourceRect, destPoint, redArray, greenArray, blueArray, alphaArray) {
+		var bw = this.canvas.width - sourceRect.width - destPoint.x;
+		var bh = this.canvas.height - sourceRect.height - destPoint.y
+
+		var dw = (bw < 0) ? sourceRect.width + (this.canvas.width - sourceRect.width - destPoint.x) : sourceRect.width;
+		var dh = (bh < 0) ? sourceRect.height + (this.canvas.height - sourceRect.height - destPoint.y) : sourceRect.height;
+		
+		var sourceData = sourceBitmapData.imagedata.data;
+		var sourcePos, destPos, sourceHex;
+		var r, g, b, pos;
+		
+		var sx = sourceRect.x;
+		var sy = sourceRect.y;
+		var sw = sourceBitmapData.width;
+		var dx = destPoint.x;
+		var dy = destPoint.y;
+		
+		var data = this.imagedata.data;
+		var w = this.width;
+		
+		for (var y=0; y<dh; y++) {
+			for (var x=0; x<dw; x++) {
+				sourcePos = ((x+sx) + (y+sy) * sw) * 4;
+				
+				r = sourceData[sourcePos+0];
+				g = sourceData[sourcePos+1];
+				b = sourceData[sourcePos+2];
+
+				pos = ((x+dx) + (y+dy) * w) * 4;
+
+				data[pos+0] = redArray[r];
+				data[pos+1] = greenArray[g];
+				data[pos+2] = blueArray[b];
+			}
+		}
+		
+		this.context.putImageData(this.imagedata, 0, 0);
+	};
+	
 	this.perlinNoise = function(baseX, baseY, randomSeed, channelOptions, grayScale) {
 		this.rand = this.rand || new PRNG();
 		this.rand.seed = randomSeed;
@@ -672,9 +711,13 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 		var sourceData = sourceBitmapData.imagedata.data;
 		var sourcePos, destPos, sourceHex;
 		
+		var sx = sourceRect.x;
+		var sy = sourceRect.y;
+		var sw = sourceBitmapData.width;
+		
 		for (var y=0; y<dh; y++) {
 			for (var x=0; x<dw; x++) {
-				sourcePos = ((x+sourceRect.x) + (y+sourceRect.y) * sourceBitmapData.width) * 4;
+				sourcePos = ((x+sx) + (y+sy) * sw) * 4;
 				sourceHex = RGBToHex({r:sourceData[sourcePos], g:sourceData[sourcePos+1], b:sourceData[sourcePos+2]});
 				
 				switch(operation) {

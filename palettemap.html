@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title>PaletteMap Example</title> 
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/global.css" type="text/css" />
+		<script type="text/javascript" src="js/Point.js"></script>
+		<script type="text/javascript" src="js/Rectangle.js"></script>
+		<script type="text/javascript" src="js/Matrix.js"></script>
+		<script type="text/javascript" src="js/BitmapData.js"></script>
+		<script> 
+			function init(){
+				bmd = document.getElementById("canvas").bitmapData;
+				
+				lenna = new Image();
+				lenna.src = "res/lenna-300x300.png";
+				lennaData = new BitmapData(300, 300);
+				lennaData.draw(lenna);
+				
+				colorModifier = 1;
+				rArray = [], gArray = [], bArray = [];
+				point = new Point(0, 0);
+				
+				setInterval(function() {
+					for(i=0; i<256; i++) {
+						r = i + colorModifier;
+						if(r > 255) r = r-256;
+						
+						g = i + colorModifier + r;
+						if(g > 255) g = g-256;
+						
+						b = i + colorModifier + g;
+						if(b > 255) b = b-256;
+						
+						rArray[i] = r;
+						gArray[i] = g;
+						bArray[i] = b;
+					}
+
+					bmd.paletteMap(lennaData, lennaData.rect, point, rArray, gArray, bArray);
+				
+					colorModifier += 1;
+					if(colorModifier > 254) colorModifier = 0;
+				}, 10);	
+			};	
+		</script>
+	</head> 
+	<body onload="init();"> 
+		<div id="container">
+			<div id="example-container">
+				<div id="example">
+					
+					
+					<canvas id="canvas" width="300" height="300"></canvas><br>
+					<img id="lenna" src="res/lenna-300x300.png" width="300" height="300" /><br>
+					
+					
+				</div> 
+				<div id="code">
+					<pre>bmd = document.getElementById("canvas").bitmapData;
+
+lenna = new Image();
+lenna.src = "res/lenna-300x300.png";
+lennaData = new BitmapData(300, 300);
+lennaData.draw(lenna);
+
+colorModifier = 1;
+rArray = [], gArray = [], bArray = [];
+point = new Point(0, 0);
+
+setInterval(function() {
+	for(i=0; i&lt;256; i++) {
+		r = i + colorModifier;
+		if(r > 255) r = r-256;
+
+		g = i + colorModifier + r;
+		if(g > 255) g = g-256;
+
+		b = i + colorModifier + g;
+		if(b > 255) b = b-256;
+
+		rArray[i] = r;
+		gArray[i] = g;
+		bArray[i] = b;
+	}
+
+	bmd.paletteMap(lennaData, 
+		lennaData.rect, 
+		point, 
+		rArray, 
+		gArray, 
+		bArray);
+
+	colorModifier += 1;
+	if(colorModifier > 254) colorModifier = 0;
+}, 10);</pre>
+				</div>
+			</div>
+			<div class="break"><img src="res/break.gif"></div>
+			<div id="links">
+				<ul>
+					<li><a href="index.html">back</a></li>
+				</ul>
+			</div>
+		</div>
+	</body> 
+</html>
