@@ -227,6 +227,12 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 		return RGBToHex(rgb);
 	};
 	
+	this.clear = function(rect) {
+		rect=rect || this.rect;
+		this.context.clearRect(rect.x, rect.y, rect.width, rect.height);
+		this.imagedata = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+	};
+	
 	this.clone = function() {
 		this.context.putImageData(this.imagedata, 0, 0);
 		
