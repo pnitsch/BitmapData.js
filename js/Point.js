@@ -33,8 +33,8 @@ function Point (x, y) {
 	* @returns {Number} The distance between the first and second points.
 	*/
 	Point.distance = function(pt1, pt2) {
-		var dx = Math.abs(p2.x - p1.x);
-		var dy = Math.abs(p2.y - p1.y);
+		var dx = p2.x - p1.x;
+		var dy = p2.y - p1.y;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 	
