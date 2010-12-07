@@ -372,17 +372,6 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 							if(sourceData[sourcePos+2] < 128) data[destPos+2] = data[destPos+2] * sourceData[sourcePos+2] * halfColorMax;
 							else data[destPos+2] = 255 - (255-data[destPos+2])*(255-sourceData[sourcePos+2])*halfColorMax;
 						break;
-
-						case BlendMode.OVERLAY:
-							if(sourceData[sourcePos] < 128) data[destPos] = data[destPos] * sourceData[sourcePos] * halfColorMax;
-							else data[destPos] = 255 - (255-data[destPos])*(255-sourceData[sourcePos])*halfColorMax;
-							
-							if(sourceData[sourcePos+1] < 128) data[destPos+1] = data[destPos+1] * sourceData[sourcePos+1] * halfColorMax;
-							else data[destPos+1] = 255 - (255-data[destPos+1])*(255-sourceData[sourcePos+1])*halfColorMax;
-							
-							if(sourceData[sourcePos+2] < 128) data[destPos+2] = data[destPos+2] * sourceData[sourcePos+2] * halfColorMax;
-							else data[destPos+2] = 255 - (255-data[destPos+2])*(255-sourceData[sourcePos+2])*halfColorMax;
-						break;
 						
 						case BlendMode.HARDLIGHT:
 							if(data[destPos] < 128) data[destPos] = data[destPos] * sourceData[sourcePos] * halfColorMax;
