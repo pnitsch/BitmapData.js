@@ -272,6 +272,7 @@ function BitmapData(width, height, transparent, fillColor, canvas) {
 	this.applyFilter = function(sourceBitmapData, sourceRect, destPoint, filter) {
 		var copy = this.clone();
 		filter.run(sourceRect, this.imagedata.data, copy.imagedata.data);
+		this.context.putImageData(this.imagedata, 0, 0);
 	};
 	
 	this.compare = function(otherBitmapData) {
